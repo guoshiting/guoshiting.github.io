@@ -1,6 +1,54 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title>JAVA程序打war包-idea</title>
+    <url>/2022/09/19/JAVA%E7%A8%8B%E5%BA%8F%E6%89%93war%E5%8C%85-idea/</url>
+    <content><![CDATA[<h1 id="JAVA程序打war包-idea"><a href="#JAVA程序打war包-idea" class="headerlink" title="JAVA程序打war包(idea)"></a>JAVA程序打war包(idea)</h1><span id="more"></span>
+
+<ul>
+<li><h2 id="war包设置"><a href="#war包设置" class="headerlink" title="war包设置"></a>war包设置</h2><blockquote>
+<p>1.File -&gt; Project Structure</p>
+</blockquote>
+</li>
+</ul>
+<p><img src="/pictures/2-1.png" alt="alt 2-1"></p>
+<p><img src="/pictures/2-2.png" alt="alt 2-2"></p>
+<ul>
+<li><h2 id="war包编译设置"><a href="#war包编译设置" class="headerlink" title="war包编译设置"></a>war包编译设置</h2></li>
+</ul>
+<blockquote>
+<p>1.设置工程打包路径</p>
+</blockquote>
+<p><img src="/pictures/2-3.png" alt="alt 2-3"></p>
+<blockquote>
+<p>2.加入class和lib</p>
+</blockquote>
+<p><img src="/pictures/2-4.png" alt="alt 2-4"></p>
+<p><img src="/pictures/2-5.png" alt="alt 2-5"></p>
+<ul>
+<li><h2 id="打包"><a href="#打包" class="headerlink" title="打包"></a>打包</h2></li>
+</ul>
+<blockquote>
+<p>Build -&gt; Build Artifacts -&gt; Build</p>
+</blockquote>
+<p><img src="/pictures/2-6.png" alt="alt 2-6"></p>
+<p><img src="/pictures/2-7.png" alt="alt 2-7"></p>
+<ul>
+<li><h2 id="注意设置java编译路径"><a href="#注意设置java编译路径" class="headerlink" title="注意设置java编译路径"></a>注意设置java编译路径</h2></li>
+</ul>
+<blockquote>
+<p>1.File -&gt; Project Structure -&gt; Project</p>
+</blockquote>
+<p><img src="/pictures/2-8.jpg" alt="alt 2-8"></p>
+]]></content>
+      <categories>
+        <category>idea使用</category>
+      </categories>
+      <tags>
+        <tag>IDEA</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>hexo-next新增文章</title>
     <url>/2022/09/19/hexo-next%E6%96%B0%E5%A2%9E%E6%96%87%E7%AB%A0/</url>
     <content><![CDATA[<h1 id="hexo-next新增文章"><a href="#hexo-next新增文章" class="headerlink" title="hexo-next新增文章"></a>hexo-next新增文章</h1><span id="more"></span>
@@ -9,13 +57,19 @@
 <li><h2 id="安装hexo"><a href="#安装hexo" class="headerlink" title="安装hexo"></a>安装hexo</h2><blockquote>
 <p>1.安装node.js和git</p>
 <p>2.安装hexo</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">#安装hexo</span><br><span class="line">npm install -g hexo</span><br><span class="line">#新建自己的项目文件夹(myproject)并进入自己的项目文件夹</span><br><span class="line">cd myproject</span><br><span class="line">hexo init</span><br><span class="line">#安装依赖</span><br><span class="line">npm install</span><br><span class="line">#hexo编译和启动</span><br><span class="line">hexo g</span><br><span class="line">hexo s</span><br><span class="line">#访问http://localhost:4000,查看hexo是否搭建成功</span><br></pre></td></tr></table></figure>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">#安装hexo</span><br><span class="line">npm install -g hexo</span><br><span class="line">#新建自己的项目文件夹(myproject)并进入自己的项目文件夹</span><br><span class="line">cd myproject</span><br><span class="line">hexo init</span><br><span class="line">#安装依赖</span><br><span class="line">npm install</span><br><span class="line">#hexo编译和启动</span><br><span class="line">hexo g</span><br><span class="line">hexo s</span><br><span class="line">#访问http://localhost:4000,查看hexo是否搭建成功</span><br></pre></td></tr></table></figure></blockquote>
+</li>
+</ul>
+<blockquote>
+<p>3.安装git插件</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">npm install hexo-deployer-git --save</span><br></pre></td></tr></table></figure>
+
+
 </blockquote>
 <h1 id="安装hexo-next"><a href="#安装hexo-next" class="headerlink" title="安装hexo-next"></a>安装hexo-next</h1><blockquote>
 <p>1.安装hexo-next插件</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">&gt;#先myproject目录下执行</span><br><span class="line">&gt;git clone https://github.com/theme-next/hexo-theme-next.git</span><br><span class="line">&gt;#修改myproject目录下的_conf.yml</span><br><span class="line">&gt;theme: next</span><br></pre></td></tr></table></figure></blockquote>
-</li>
-</ul>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">&gt;#先myproject目录下执行</span><br><span class="line">&gt;git clone https://github.com/theme-next/hexo-theme-next.git</span><br><span class="line">&gt;#修改myproject目录下的_conf.yml</span><br><span class="line">&gt;theme: next</span><br></pre></td></tr></table></figure>
+</blockquote>
 <p><img src="/pictures/update_hexo_config.png" alt="alt 修改config"></p>
 <ul>
 <li><h1 id="新建文章"><a href="#新建文章" class="headerlink" title="新建文章"></a>新建文章</h1><blockquote>
@@ -86,54 +140,6 @@
       </categories>
       <tags>
         <tag>Spring</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>JAVA程序打war包-idea</title>
-    <url>/2022/09/19/JAVA%E7%A8%8B%E5%BA%8F%E6%89%93war%E5%8C%85-idea/</url>
-    <content><![CDATA[<h1 id="JAVA程序打war包-idea"><a href="#JAVA程序打war包-idea" class="headerlink" title="JAVA程序打war包(idea)"></a>JAVA程序打war包(idea)</h1><span id="more"></span>
-
-<ul>
-<li><h2 id="war包设置"><a href="#war包设置" class="headerlink" title="war包设置"></a>war包设置</h2><blockquote>
-<p>1.File -&gt; Project Structure</p>
-</blockquote>
-</li>
-</ul>
-<p><img src="/pictures/2-1.png" alt="alt 2-1"></p>
-<p><img src="/pictures/2-2.png" alt="alt 2-2"></p>
-<ul>
-<li><h2 id="war包编译设置"><a href="#war包编译设置" class="headerlink" title="war包编译设置"></a>war包编译设置</h2></li>
-</ul>
-<blockquote>
-<p>1.设置工程打包路径</p>
-</blockquote>
-<p><img src="/pictures/2-3.png" alt="alt 2-3"></p>
-<blockquote>
-<p>2.加入class和lib</p>
-</blockquote>
-<p><img src="/pictures/2-4.png" alt="alt 2-4"></p>
-<p><img src="/pictures/2-5.png" alt="alt 2-5"></p>
-<ul>
-<li><h2 id="打包"><a href="#打包" class="headerlink" title="打包"></a>打包</h2></li>
-</ul>
-<blockquote>
-<p>Build -&gt; Build Artifacts -&gt; Build</p>
-</blockquote>
-<p><img src="/pictures/2-6.png" alt="alt 2-6"></p>
-<p><img src="/pictures/2-7.png" alt="alt 2-7"></p>
-<ul>
-<li><h2 id="注意设置java编译路径"><a href="#注意设置java编译路径" class="headerlink" title="注意设置java编译路径"></a>注意设置java编译路径</h2></li>
-</ul>
-<blockquote>
-<p>1.File -&gt; Project Structure -&gt; Project</p>
-</blockquote>
-<p><img src="/pictures/2-8.jpg" alt="alt 2-8"></p>
-]]></content>
-      <categories>
-        <category>idea使用</category>
-      </categories>
-      <tags>
-        <tag>IDEA</tag>
       </tags>
   </entry>
 </search>
