@@ -1,51 +1,55 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
-    <title>JAVA程序打war包-idea</title>
-    <url>/2022/09/19/JAVA%E7%A8%8B%E5%BA%8F%E6%89%93war%E5%8C%85-idea/</url>
-    <content><![CDATA[<h1 id="JAVA程序打war包-idea"><a href="#JAVA程序打war包-idea" class="headerlink" title="JAVA程序打war包(idea)"></a>JAVA程序打war包(idea)</h1><span id="more"></span>
+    <title>BIO,NIO&amp;AIO认识</title>
+    <url>/2022/09/20/BIO-NIO-AIO%E8%AE%A4%E8%AF%86/</url>
+    <content><![CDATA[<h1 id="BIO-NIO-amp-AIO认识"><a href="#BIO-NIO-amp-AIO认识" class="headerlink" title="BIO,NIO&amp;AIO认识"></a>BIO,NIO&amp;AIO认识</h1><span id="more"></span>
 
+<h3 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h3><p><strong>1.BIO(Blocking IO)</strong></p>
 <ul>
-<li><h2 id="war包设置"><a href="#war包设置" class="headerlink" title="war包设置"></a>war包设置</h2><blockquote>
-<p>1.File -&gt; Project Structure</p>
-</blockquote>
-</li>
+<li>同步阻塞模型，一个线程对应一个连接，连接时(accept)阻塞等待客户端连接，读取信息(read)时阻塞，等待客户端发送消息。</li>
 </ul>
-<p><img src="/pictures/2-1.png" alt="alt 2-1"></p>
-<p><img src="/pictures/2-2.png" alt="alt 2-2"></p>
+<p><strong>2.NIO(Non Blocking IO)</strong></p>
 <ul>
-<li><h2 id="war包编译设置"><a href="#war包编译设置" class="headerlink" title="war包编译设置"></a>war包编译设置</h2></li>
+<li>同步非阻塞模型，利用多路复用机制，实现一个线程处理多个连接；客户端的连接请求会注册到多路复用器(selector)上，多路复用器<strong>同步等待</strong>轮询或回调到有请求时就用进行处理。</li>
+<li><strong>应用</strong>：常用于并发高，连接短，操作轻的情况，例如：聊天室</li>
 </ul>
-<blockquote>
-<p>1.设置工程打包路径</p>
-</blockquote>
-<p><img src="/pictures/2-3.png" alt="alt 2-3"></p>
-<blockquote>
-<p>2.加入class和lib</p>
-</blockquote>
-<p><img src="/pictures/2-4.png" alt="alt 2-4"></p>
-<p><img src="/pictures/2-5.png" alt="alt 2-5"></p>
+<p><strong>3.AIO(NIO 2.0)</strong></p>
 <ul>
-<li><h2 id="打包"><a href="#打包" class="headerlink" title="打包"></a>打包</h2></li>
+<li>异步非阻塞模型，由操作系统(底层OS)回调通知服务器<strong>异步</strong>处理IO事件</li>
+<li><strong>应用</strong>：连接时间长，操作重的场景。</li>
 </ul>
-<blockquote>
-<p>Build -&gt; Build Artifacts -&gt; Build</p>
-</blockquote>
-<p><img src="/pictures/2-6.png" alt="alt 2-6"></p>
-<p><img src="/pictures/2-7.png" alt="alt 2-7"></p>
+<h3 id="NIO详解"><a href="#NIO详解" class="headerlink" title="NIO详解"></a>NIO详解</h3><p><strong>1.NIO的三大组件channel，buffer和selecter</strong></p>
 <ul>
-<li><h2 id="注意设置java编译路径"><a href="#注意设置java编译路径" class="headerlink" title="注意设置java编译路径"></a>注意设置java编译路径</h2></li>
+<li>channel为客户端和服务器的连接通道</li>
+<li>buffer数据结构为数组，buffer读取或写入channel的内容</li>
+<li>selecter多路复用器，channel注册到selecter，selecter分配空闲线程处理channel的IO事件</li>
 </ul>
-<blockquote>
-<p>1.File -&gt; Project Structure -&gt; Project</p>
-</blockquote>
-<p><img src="/pictures/2-8.jpg" alt="alt 2-8"></p>
+<p><strong>2.NioSelectorServe初识</strong></p>
+<ul>
+<li>Selector.open() &#x2F;&#x2F;创建多路复用器，生成一个Selector对象</li>
+<li>socketChannel.register(Selector，type) &#x2F;&#x2F;将channel注册到多路复用器上，并规定时间类型</li>
+<li>selector.select() &#x2F;&#x2F;阻塞等待注册的channel发生IO事件</li>
+<li>selector.selectedKeys() &#x2F;&#x2F;返回所有有IO事件的集合(SelectionKey),通过集合中的元素可以找到channel</li>
+</ul>
+<p><strong>3.epoll初识</strong></p>
+<ul>
+<li>JDK1.4以前用select(连接数为1024)或poll(连接数无上限)来实现NIO，JDK1.5开始使用epoll实现NIO。</li>
+<li>select()或poll()通过不断轮询事件，来确定是否发生了IO事件。</li>
+<li>epoll：OS感应到网络IO事件时，通过回调方法把事件放到一个文件中(可以理解为集合)，调用 selectedKeys时获取封装的事件。</li>
+</ul>
+<p><strong>3.为什么NIO使用较广</strong></p>
+<ul>
+<li>linux中，AIO的底层实现仍使用Epoll，性能上没有太大的优势</li>
+<li>linux中，AIO的实现还不够成熟</li>
+<li>Netty框架使用较多，Netty在NIO上做了很多异步的封装</li>
+</ul>
 ]]></content>
       <categories>
-        <category>idea使用</category>
+        <category>JAVA</category>
       </categories>
       <tags>
-        <tag>IDEA</tag>
+        <tag>Netty</tag>
       </tags>
   </entry>
   <entry>
@@ -95,6 +99,54 @@
       </categories>
       <tags>
         <tag>hexo</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>JAVA程序打war包-idea</title>
+    <url>/2022/09/19/JAVA%E7%A8%8B%E5%BA%8F%E6%89%93war%E5%8C%85-idea/</url>
+    <content><![CDATA[<h1 id="JAVA程序打war包-idea"><a href="#JAVA程序打war包-idea" class="headerlink" title="JAVA程序打war包(idea)"></a>JAVA程序打war包(idea)</h1><span id="more"></span>
+
+<ul>
+<li><h2 id="war包设置"><a href="#war包设置" class="headerlink" title="war包设置"></a>war包设置</h2><blockquote>
+<p>1.File -&gt; Project Structure</p>
+</blockquote>
+</li>
+</ul>
+<p><img src="/pictures/2-1.png" alt="alt 2-1"></p>
+<p><img src="/pictures/2-2.png" alt="alt 2-2"></p>
+<ul>
+<li><h2 id="war包编译设置"><a href="#war包编译设置" class="headerlink" title="war包编译设置"></a>war包编译设置</h2></li>
+</ul>
+<blockquote>
+<p>1.设置工程打包路径</p>
+</blockquote>
+<p><img src="/pictures/2-3.png" alt="alt 2-3"></p>
+<blockquote>
+<p>2.加入class和lib</p>
+</blockquote>
+<p><img src="/pictures/2-4.png" alt="alt 2-4"></p>
+<p><img src="/pictures/2-5.png" alt="alt 2-5"></p>
+<ul>
+<li><h2 id="打包"><a href="#打包" class="headerlink" title="打包"></a>打包</h2></li>
+</ul>
+<blockquote>
+<p>Build -&gt; Build Artifacts -&gt; Build</p>
+</blockquote>
+<p><img src="/pictures/2-6.png" alt="alt 2-6"></p>
+<p><img src="/pictures/2-7.png" alt="alt 2-7"></p>
+<ul>
+<li><h2 id="注意设置java编译路径"><a href="#注意设置java编译路径" class="headerlink" title="注意设置java编译路径"></a>注意设置java编译路径</h2></li>
+</ul>
+<blockquote>
+<p>1.File -&gt; Project Structure -&gt; Project</p>
+</blockquote>
+<p><img src="/pictures/2-8.jpg" alt="alt 2-8"></p>
+]]></content>
+      <categories>
+        <category>idea使用</category>
+      </categories>
+      <tags>
+        <tag>IDEA</tag>
       </tags>
   </entry>
   <entry>
