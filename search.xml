@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
-    <title>BIO,NIO&amp;AIO认识</title>
+    <title>BIO,NIO&amp;AIO认识以及Netty初识</title>
     <url>/2022/09/20/BIO-NIO-AIO%E8%AE%A4%E8%AF%86/</url>
-    <content><![CDATA[<h1 id="BIO-NIO-amp-AIO认识"><a href="#BIO-NIO-amp-AIO认识" class="headerlink" title="BIO,NIO&amp;AIO认识"></a>BIO,NIO&amp;AIO认识</h1><span id="more"></span>
+    <content><![CDATA[<h1 id="BIO-NIO-amp-AIO认识及Netty初识"><a href="#BIO-NIO-amp-AIO认识及Netty初识" class="headerlink" title="BIO,NIO&amp;AIO认识及Netty初识"></a>BIO,NIO&amp;AIO认识及Netty初识</h1><span id="more"></span>
 
 <h3 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h3><p><strong>1.BIO(Blocking IO)</strong></p>
 <ul>
@@ -43,6 +43,14 @@
 <li>linux中，AIO的底层实现仍使用Epoll，性能上没有太大的优势</li>
 <li>linux中，AIO的实现还不够成熟</li>
 <li>Netty框架使用较多，Netty在NIO上做了很多异步的封装</li>
+</ul>
+<h3 id="Netty初识"><a href="#Netty初识" class="headerlink" title="Netty初识"></a>Netty初识</h3><p><strong>1.Netty概述</strong></p>
+<ul>
+<li>netty是一种异步的，事件驱动的网络通信框架。性能比较好，应用较广，Dubbo 协议默认使用 Netty 作为基础通信组件以及游戏行业使用较广。</li>
+</ul>
+<p><strong>2.线程模型</strong></p>
+<ul>
+<li><img src="/pictures/netty-01.png" alt="alt netty线程模型"></li>
 </ul>
 ]]></content>
       <categories>
