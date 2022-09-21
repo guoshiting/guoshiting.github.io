@@ -52,12 +52,65 @@
 <ul>
 <li><img src="/pictures/netty-01.png" alt="alt netty线程模型"></li>
 </ul>
+<p><strong>3.其他概念</strong></p>
+<ul>
+<li>Future和ChannelFuture可以注册监听，来确认操作的状态；ChannelHandler时处理IO事件的类</li>
+<li>ByteBuf:Netty常用的的缓存类，进行读写，ByteBuf 由一串字节数组构成，并提供了两个索引，一个用于读取数据，一个用于写入数据；读取时，它的 readerIndex（读索引）将会根据读取的字节数递增，写入时它的 writerIndex 也会根据写入的字节数进行递增。</li>
+</ul>
 ]]></content>
       <categories>
         <category>JAVA</category>
       </categories>
       <tags>
         <tag>Netty</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>JAVA程序打war包-idea</title>
+    <url>/2022/09/19/JAVA%E7%A8%8B%E5%BA%8F%E6%89%93war%E5%8C%85-idea/</url>
+    <content><![CDATA[<h1 id="JAVA程序打war包-idea"><a href="#JAVA程序打war包-idea" class="headerlink" title="JAVA程序打war包(idea)"></a>JAVA程序打war包(idea)</h1><span id="more"></span>
+
+<ul>
+<li><h2 id="war包设置"><a href="#war包设置" class="headerlink" title="war包设置"></a>war包设置</h2><blockquote>
+<p>1.File -&gt; Project Structure</p>
+</blockquote>
+</li>
+</ul>
+<p><img src="/pictures/2-1.png" alt="alt 2-1"></p>
+<p><img src="/pictures/2-2.png" alt="alt 2-2"></p>
+<ul>
+<li><h2 id="war包编译设置"><a href="#war包编译设置" class="headerlink" title="war包编译设置"></a>war包编译设置</h2></li>
+</ul>
+<blockquote>
+<p>1.设置工程打包路径</p>
+</blockquote>
+<p><img src="/pictures/2-3.png" alt="alt 2-3"></p>
+<blockquote>
+<p>2.加入class和lib</p>
+</blockquote>
+<p><img src="/pictures/2-4.png" alt="alt 2-4"></p>
+<p><img src="/pictures/2-5.png" alt="alt 2-5"></p>
+<ul>
+<li><h2 id="打包"><a href="#打包" class="headerlink" title="打包"></a>打包</h2></li>
+</ul>
+<blockquote>
+<p>Build -&gt; Build Artifacts -&gt; Build</p>
+</blockquote>
+<p><img src="/pictures/2-6.png" alt="alt 2-6"></p>
+<p><img src="/pictures/2-7.png" alt="alt 2-7"></p>
+<ul>
+<li><h2 id="注意设置java编译路径"><a href="#注意设置java编译路径" class="headerlink" title="注意设置java编译路径"></a>注意设置java编译路径</h2></li>
+</ul>
+<blockquote>
+<p>1.File -&gt; Project Structure -&gt; Project</p>
+</blockquote>
+<p><img src="/pictures/2-8.jpg" alt="alt 2-8"></p>
+]]></content>
+      <categories>
+        <category>idea使用</category>
+      </categories>
+      <tags>
+        <tag>IDEA</tag>
       </tags>
   </entry>
   <entry>
@@ -107,54 +160,6 @@
       </categories>
       <tags>
         <tag>hexo</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>JAVA程序打war包-idea</title>
-    <url>/2022/09/19/JAVA%E7%A8%8B%E5%BA%8F%E6%89%93war%E5%8C%85-idea/</url>
-    <content><![CDATA[<h1 id="JAVA程序打war包-idea"><a href="#JAVA程序打war包-idea" class="headerlink" title="JAVA程序打war包(idea)"></a>JAVA程序打war包(idea)</h1><span id="more"></span>
-
-<ul>
-<li><h2 id="war包设置"><a href="#war包设置" class="headerlink" title="war包设置"></a>war包设置</h2><blockquote>
-<p>1.File -&gt; Project Structure</p>
-</blockquote>
-</li>
-</ul>
-<p><img src="/pictures/2-1.png" alt="alt 2-1"></p>
-<p><img src="/pictures/2-2.png" alt="alt 2-2"></p>
-<ul>
-<li><h2 id="war包编译设置"><a href="#war包编译设置" class="headerlink" title="war包编译设置"></a>war包编译设置</h2></li>
-</ul>
-<blockquote>
-<p>1.设置工程打包路径</p>
-</blockquote>
-<p><img src="/pictures/2-3.png" alt="alt 2-3"></p>
-<blockquote>
-<p>2.加入class和lib</p>
-</blockquote>
-<p><img src="/pictures/2-4.png" alt="alt 2-4"></p>
-<p><img src="/pictures/2-5.png" alt="alt 2-5"></p>
-<ul>
-<li><h2 id="打包"><a href="#打包" class="headerlink" title="打包"></a>打包</h2></li>
-</ul>
-<blockquote>
-<p>Build -&gt; Build Artifacts -&gt; Build</p>
-</blockquote>
-<p><img src="/pictures/2-6.png" alt="alt 2-6"></p>
-<p><img src="/pictures/2-7.png" alt="alt 2-7"></p>
-<ul>
-<li><h2 id="注意设置java编译路径"><a href="#注意设置java编译路径" class="headerlink" title="注意设置java编译路径"></a>注意设置java编译路径</h2></li>
-</ul>
-<blockquote>
-<p>1.File -&gt; Project Structure -&gt; Project</p>
-</blockquote>
-<p><img src="/pictures/2-8.jpg" alt="alt 2-8"></p>
-]]></content>
-      <categories>
-        <category>idea使用</category>
-      </categories>
-      <tags>
-        <tag>IDEA</tag>
       </tags>
   </entry>
   <entry>
