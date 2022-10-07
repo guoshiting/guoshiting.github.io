@@ -55,7 +55,35 @@
 <p><strong>3.其他概念</strong></p>
 <ul>
 <li>Future和ChannelFuture可以注册监听，来确认操作的状态；ChannelHandler时处理IO事件的类</li>
-<li>ByteBuf:Netty常用的的缓存类，进行读写，ByteBuf 由一串字节数组构成，并提供了两个索引，一个用于读取数据，一个用于写入数据；读取时，它的 readerIndex（读索引）将会根据读取的字节数递增，写入时它的 writerIndex 也会根据写入的字节数进行递增。</li>
+<li>ByteBuf:Netty常用的的缓存类，进行读写，ByteBuf 由一串字节数组构成，并提供了两个索引，一个用于读取数据，一个用于写入数据；读取时，它的 readerIndex（读索引）将会根据读取的字节数递增，写入时它的 writerIndex 也会根据写入的字节数进行递增。<strong>byteBuf可以自动扩容</strong></li>
+</ul>
+<p><strong>4.粘包和拆包</strong></p>
+<ul>
+<li><p>TCP是一个流协议，数据传输没有界限的，所以在数据传输中可能会被TCP拆分成多个包进行发送，也有可能把多个小的包封装成 一个大的数据包发送，这就是所谓的TCP粘包和拆包问题。</p>
+</li>
+<li><p>解决方案</p>
+<blockquote>
+<p>1.消息定长度，传输的数据大小固定长度，例如每段的长度固定为100字节，如果不够空位补空格</p>
+<p>2.在数据包尾部添加特殊分隔符，比如下划线。</p>
+<p>3.发送长度：发送每条数据的时候，将数据的长度一并发送，如：长度+消息 一起发送</p>
+</blockquote>
+</li>
+</ul>
+<p><strong>5.Netty心跳检测机制</strong></p>
+<ul>
+<li>IdleStateHandler可以设置超时时间</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 读超时  写超时  all超时</span></span><br><span class="line">pipeline.addLast(<span class="keyword">new</span> <span class="title class_">IdleStateHandler</span>(<span class="number">3</span>, <span class="number">0</span>, <span class="number">0</span>, TimeUnit.SECONDS));</span><br><span class="line"><span class="comment">// 超时之后会触发 userEventTriggered 方法</span></span><br><span class="line">READER_IDLE 读超时</span><br><span class="line">WRITER_IDLE 写超时</span><br><span class="line">ALL_IDLE    all超时</span><br></pre></td></tr></table></figure>
+
+<p><strong>6.Netty零拷贝</strong></p>
+<ul>
+<li><p>Netty的接收和发送ByteBuffer采用DIRECT BUFFERS，使用堆外直接内存进行Socket读写，不需要进行字节缓冲区的二次拷贝。</p>
+<blockquote>
+<p>使用直接内存的优缺点：</p>
+<p>优点：1.不占用堆内存空间，减少了发生GC的可能  2.本地IO会直接操作直接内存（直接内存&#x3D;&gt;系统调用&#x3D;&gt;硬盘&#x2F;网卡）,而非直接内存则需要二次拷贝（堆内 存&#x3D;&gt;直接内存&#x3D;&gt;系统调用&#x3D;&gt;硬盘&#x2F;网卡）</p>
+<p>缺点：1.初始分配较慢 2.没有JVM直接帮助管理内存，容易发生内存溢出。</p>
+</blockquote>
+</li>
 </ul>
 ]]></content>
       <categories>
@@ -63,6 +91,51 @@
       </categories>
       <tags>
         <tag>Netty</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>自动注入@Autowired和@Resource</title>
+    <url>/2022/09/19/%E8%87%AA%E5%8A%A8%E6%B3%A8%E5%85%A5-Autowired%E5%92%8C-Resource/</url>
+    <content><![CDATA[<h1 id="自动注入-Autowired和-Resource"><a href="#自动注入-Autowired和-Resource" class="headerlink" title="自动注入@Autowired和@Resource"></a>自动注入@Autowired和@Resource</h1><span id="more"></span>
+
+<h4 id="1-来源不同"><a href="#1-来源不同" class="headerlink" title="1.来源不同"></a>1.来源不同</h4><blockquote>
+<ul>
+<li>@Autowired来自Spring，全路径类名为：org.springframework.beans.factory.annotation.Autowired</li>
+<li>@Resource 来自JDK，全路径类名为：javax.annotation.Resource</li>
+</ul>
+</blockquote>
+<h4 id="2-注入方式不同"><a href="#2-注入方式不同" class="headerlink" title="2.注入方式不同"></a>2.注入方式不同</h4><blockquote>
+<p><del>大家的常识似乎为@Autowired是根据类型注入的，如果两个类实现同一个接口就不能用@Autowired</del>，<strong>但这个常识是错误的</strong></p>
+<p>@Autowired的注入方式为：</p>
+<ul>
+<li>如果查询结果刚好为一个，就将该bean装配给@Autowired指定的数据</li>
+<li>如果查询的结果不止一个，先根据 @Primary 来决策，其次是 @Priority 决策优先级</li>
+<li>最后是根据 Bean 名字的严格匹配来决策</li>
+</ul>
+<p><img src="/pictures/autowire.png" alt="alt 修改config"></p>
+<p>@Resource的注入方式为：</p>
+<ul>
+<li>如果没有指定name和type属性的话，默认首先使用属性名称作为bean name进行注入，如果查询不到，则使用属性的类型进行查找注入</li>
+<li>如果指定了name和type其中一个，就按照指定的来进行注入，找不到或者找到多个，都会抛出异常</li>
+<li>如果同时指定了name和type，则从Spring上下文中找到唯一匹配（类型和名称同时匹配）的bean进行装配，找不到则抛出异常</li>
+</ul>
+</blockquote>
+<h4 id="其他方面"><a href="#其他方面" class="headerlink" title="其他方面"></a>其他方面</h4><blockquote>
+<ul>
+<li><p>如果@Autowired想指定名称注入的话，一般用@Autowired+@Qualifie(“beanName”)的方式</p>
+</li>
+<li><p>@Autowired与@Resource都可以用来装配bean. 都可以写在字段上,或写在setter方法上。</p>
+</li>
+<li><p>@Autowired默认情况下必须要求依赖对象必须存在，如果要允许null值，可以设置它的required属性为false（@Autowired(required&#x3D;false)</p>
+</li>
+</ul>
+</blockquote>
+]]></content>
+      <categories>
+        <category>spring初识</category>
+      </categories>
+      <tags>
+        <tag>Spring</tag>
       </tags>
   </entry>
   <entry>
@@ -160,51 +233,6 @@
       </categories>
       <tags>
         <tag>hexo</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>自动注入@Autowired和@Resource</title>
-    <url>/2022/09/19/%E8%87%AA%E5%8A%A8%E6%B3%A8%E5%85%A5-Autowired%E5%92%8C-Resource/</url>
-    <content><![CDATA[<h1 id="自动注入-Autowired和-Resource"><a href="#自动注入-Autowired和-Resource" class="headerlink" title="自动注入@Autowired和@Resource"></a>自动注入@Autowired和@Resource</h1><span id="more"></span>
-
-<h4 id="1-来源不同"><a href="#1-来源不同" class="headerlink" title="1.来源不同"></a>1.来源不同</h4><blockquote>
-<ul>
-<li>@Autowired来自Spring，全路径类名为：org.springframework.beans.factory.annotation.Autowired</li>
-<li>@Resource 来自JDK，全路径类名为：javax.annotation.Resource</li>
-</ul>
-</blockquote>
-<h4 id="2-注入方式不同"><a href="#2-注入方式不同" class="headerlink" title="2.注入方式不同"></a>2.注入方式不同</h4><blockquote>
-<p><del>大家的常识似乎为@Autowired是根据类型注入的，如果两个类实现同一个接口就不能用@Autowired</del>，<strong>但这个常识是错误的</strong></p>
-<p>@Autowired的注入方式为：</p>
-<ul>
-<li>如果查询结果刚好为一个，就将该bean装配给@Autowired指定的数据</li>
-<li>如果查询的结果不止一个，先根据 @Primary 来决策，其次是 @Priority 决策优先级</li>
-<li>最后是根据 Bean 名字的严格匹配来决策</li>
-</ul>
-<p><img src="/pictures/autowire.png" alt="alt 修改config"></p>
-<p>@Resource的注入方式为：</p>
-<ul>
-<li>如果没有指定name和type属性的话，默认首先使用属性名称作为bean name进行注入，如果查询不到，则使用属性的类型进行查找注入</li>
-<li>如果指定了name和type其中一个，就按照指定的来进行注入，找不到或者找到多个，都会抛出异常</li>
-<li>如果同时指定了name和type，则从Spring上下文中找到唯一匹配（类型和名称同时匹配）的bean进行装配，找不到则抛出异常</li>
-</ul>
-</blockquote>
-<h4 id="其他方面"><a href="#其他方面" class="headerlink" title="其他方面"></a>其他方面</h4><blockquote>
-<ul>
-<li><p>如果@Autowired想指定名称注入的话，一般用@Autowired+@Qualifie(“beanName”)的方式</p>
-</li>
-<li><p>@Autowired与@Resource都可以用来装配bean. 都可以写在字段上,或写在setter方法上。</p>
-</li>
-<li><p>@Autowired默认情况下必须要求依赖对象必须存在，如果要允许null值，可以设置它的required属性为false（@Autowired(required&#x3D;false)</p>
-</li>
-</ul>
-</blockquote>
-]]></content>
-      <categories>
-        <category>spring初识</category>
-      </categories>
-      <tags>
-        <tag>Spring</tag>
       </tags>
   </entry>
 </search>
