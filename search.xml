@@ -1,6 +1,130 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title>BIO,NIO&amp;AIO认识以及Netty初识</title>
+    <url>/2022/09/20/BIO-NIO-AIO%E8%AE%A4%E8%AF%86/</url>
+    <content><![CDATA[<h1 id="BIO-NIO-amp-AIO认识及Netty初识"><a href="#BIO-NIO-amp-AIO认识及Netty初识" class="headerlink" title="BIO,NIO&amp;AIO认识及Netty初识"></a>BIO,NIO&amp;AIO认识及Netty初识</h1><span id="more"></span>
+
+<h3 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h3><p><strong>1.BIO(Blocking IO)</strong></p>
+<ul>
+<li>同步阻塞模型，一个线程对应一个连接，连接时(accept)阻塞等待客户端连接，读取信息(read)时阻塞，等待客户端发送消息。</li>
+</ul>
+<p><strong>2.NIO(Non Blocking IO)</strong></p>
+<ul>
+<li>同步非阻塞模型，利用多路复用机制，实现一个线程处理多个连接；客户端的连接请求会注册到多路复用器(selector)上，多路复用器<strong>同步等待</strong>轮询或回调到有请求时就用进行处理。</li>
+<li><strong>应用</strong>：常用于并发高，连接短，操作轻的情况，例如：聊天室</li>
+</ul>
+<p><strong>3.AIO(NIO 2.0)</strong></p>
+<ul>
+<li>异步非阻塞模型，由操作系统(底层OS)回调通知服务器<strong>异步</strong>处理IO事件</li>
+<li><strong>应用</strong>：连接时间长，操作重的场景。</li>
+</ul>
+<h3 id="NIO详解"><a href="#NIO详解" class="headerlink" title="NIO详解"></a>NIO详解</h3><p><strong>1.NIO的三大组件channel，buffer和selecter</strong></p>
+<ul>
+<li>channel为客户端和服务器的连接通道</li>
+<li>buffer数据结构为数组，buffer读取或写入channel的内容</li>
+<li>selecter多路复用器，channel注册到selecter，selecter分配空闲线程处理channel的IO事件</li>
+</ul>
+<p><strong>2.NioSelectorServe初识</strong></p>
+<ul>
+<li>Selector.open() &#x2F;&#x2F;创建多路复用器，生成一个Selector对象</li>
+<li>socketChannel.register(Selector，type) &#x2F;&#x2F;将channel注册到多路复用器上，并规定时间类型</li>
+<li>selector.select() &#x2F;&#x2F;阻塞等待注册的channel发生IO事件</li>
+<li>selector.selectedKeys() &#x2F;&#x2F;返回所有有IO事件的集合(SelectionKey),通过集合中的元素可以找到channel</li>
+</ul>
+<p><strong>3.epoll初识</strong></p>
+<ul>
+<li>JDK1.4以前用select(连接数为1024)或poll(连接数无上限)来实现NIO，JDK1.5开始使用epoll实现NIO。</li>
+<li>select()或poll()通过不断轮询事件，来确定是否发生了IO事件。</li>
+<li>epoll：OS感应到网络IO事件时，通过回调方法把事件放到一个文件中(可以理解为集合)，调用 selectedKeys时获取封装的事件。</li>
+</ul>
+<p><strong>3.为什么NIO使用较广</strong></p>
+<ul>
+<li>linux中，AIO的底层实现仍使用Epoll，性能上没有太大的优势</li>
+<li>linux中，AIO的实现还不够成熟</li>
+<li>Netty框架使用较多，Netty在NIO上做了很多异步的封装</li>
+</ul>
+<h3 id="Netty初识"><a href="#Netty初识" class="headerlink" title="Netty初识"></a>Netty初识</h3><p><strong>1.Netty概述</strong></p>
+<ul>
+<li>netty是一种异步的，事件驱动的网络通信框架。性能比较好，应用较广，Dubbo 协议默认使用 Netty 作为基础通信组件以及游戏行业使用较广。</li>
+</ul>
+<p><strong>2.线程模型</strong></p>
+<ul>
+<li><img src="/pictures/netty-01.png" alt="alt netty线程模型"></li>
+</ul>
+<p><strong>3.其他概念</strong></p>
+<ul>
+<li>Future和ChannelFuture可以注册监听，来确认操作的状态；ChannelHandler时处理IO事件的类</li>
+<li>ByteBuf:Netty常用的的缓存类，进行读写，ByteBuf 由一串字节数组构成，并提供了两个索引，一个用于读取数据，一个用于写入数据；读取时，它的 readerIndex（读索引）将会根据读取的字节数递增，写入时它的 writerIndex 也会根据写入的字节数进行递增。<strong>byteBuf可以自动扩容</strong></li>
+</ul>
+<p><strong>4.粘包和拆包</strong></p>
+<ul>
+<li><p>TCP是一个流协议，数据传输没有界限的，所以在数据传输中可能会被TCP拆分成多个包进行发送，也有可能把多个小的包封装成 一个大的数据包发送，这就是所谓的TCP粘包和拆包问题。</p>
+</li>
+<li><p>解决方案</p>
+<blockquote>
+<p>1.消息定长度，传输的数据大小固定长度，例如每段的长度固定为100字节，如果不够空位补空格</p>
+<p>2.在数据包尾部添加特殊分隔符，比如下划线。</p>
+<p>3.发送长度：发送每条数据的时候，将数据的长度一并发送，如：长度+消息 一起发送</p>
+</blockquote>
+</li>
+</ul>
+<p><strong>5.Netty心跳检测机制</strong></p>
+<ul>
+<li>IdleStateHandler可以设置超时时间</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 读超时  写超时  all超时</span></span><br><span class="line">pipeline.addLast(<span class="keyword">new</span> <span class="title class_">IdleStateHandler</span>(<span class="number">3</span>, <span class="number">0</span>, <span class="number">0</span>, TimeUnit.SECONDS));</span><br><span class="line"><span class="comment">// 超时之后会触发 userEventTriggered 方法</span></span><br><span class="line">READER_IDLE 读超时</span><br><span class="line">WRITER_IDLE 写超时</span><br><span class="line">ALL_IDLE    all超时</span><br></pre></td></tr></table></figure>
+
+<p><strong>6.Netty零拷贝</strong></p>
+<ul>
+<li><p>Netty的接收和发送ByteBuffer采用DIRECT BUFFERS，使用堆外直接内存进行Socket读写，不需要进行字节缓冲区的二次拷贝。</p>
+<blockquote>
+<p>使用直接内存的优缺点：</p>
+<p>优点：1.不占用堆内存空间，减少了发生GC的可能  2.本地IO会直接操作直接内存（直接内存&#x3D;&gt;系统调用&#x3D;&gt;硬盘&#x2F;网卡）,而非直接内存则需要二次拷贝（堆内 存&#x3D;&gt;直接内存&#x3D;&gt;系统调用&#x3D;&gt;硬盘&#x2F;网卡）</p>
+<p>缺点：1.初始分配较慢 2.没有JVM直接帮助管理内存，容易发生内存溢出。</p>
+</blockquote>
+</li>
+</ul>
+]]></content>
+      <categories>
+        <category>JAVA</category>
+      </categories>
+      <tags>
+        <tag>Netty</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Dubbo中SPI机制</title>
+    <url>/2022/10/09/Dubbo%E4%B8%ADSPI%E6%9C%BA%E5%88%B6/</url>
+    <content><![CDATA[<h1 id="Dubbo中SPI机制"><a href="#Dubbo中SPI机制" class="headerlink" title="Dubbo中SPI机制"></a>Dubbo中SPI机制</h1><span id="more"></span>
+
+<h3 id="JAVA的SPI"><a href="#JAVA的SPI" class="headerlink" title="JAVA的SPI"></a>JAVA的SPI</h3><ul>
+<li>SPI机制：是一种将服务接口与服务实现分离以达到解耦、提升了程序可扩展性的机制；通过本地的注册发现获取到具体的实现类，轻松可插拔</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 1.classpath下新建META-INF/services目录中新建接口全路径命名的文件,文件内写入SPI接口的实现类</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123;</span><br><span class="line">    ServiceLoader&lt;SpiInterface&gt; load = ServiceLoader.load(SpiInterface.class);</span><br><span class="line">    Iterator&lt;SpiInterface&gt; iterator = load.iterator();   </span><br><span class="line">    <span class="keyword">while</span> (iterator.hasNext()) &#123;</span><br><span class="line">       <span class="type">SpiInterface</span> <span class="variable">next</span> <span class="operator">=</span> iterator.next();</span><br><span class="line">       next.test(<span class="string">&quot;SPI demo&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>SPI使用例子：jdbc的jar包</li>
+</ul>
+<h3 id="Dubbo中SPI"><a href="#Dubbo中SPI" class="headerlink" title="Dubbo中SPI"></a>Dubbo中SPI</h3><ul>
+<li>例子:</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">ExtensionLoader&lt;Protocol&gt; extensionLoader = ExtensionLoader.getExtensionLoader(Protocol.class);</span><br><span class="line"><span class="type">Protocol</span> <span class="variable">http</span> <span class="operator">=</span> extensionLoader.getExtension(<span class="string">&quot;dubbo&quot;</span>);</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>dubbo加载目录：META-INF&#x2F;dubbo&#x2F;internal&#x2F;；META-INF&#x2F;dubbo&#x2F;；META-INF&#x2F;services&#x2F;，dubbo的SPI方法中的文件内容为key&#x3D;class</li>
+<li>如果文件中的类有有参构造方法且构造方法的参数有且只有接口类型的参数，就会加载为包装类，SPI获取类时如果有包装类则会获取包装类，获取的实体类则注入包装类</li>
+<li>@Adaptive的含义：SPI加载类时，如果类中需要注入setXXX时，需要从Spring和SPI的容器中获取对应的bean，如果spring中没有，SPI容器中找到有@Adaptive标注的类，如果没有的话， 则需要在响应的方法中加上@Adaptive生成代理方法，代理方法参数中必须有URL参数或者有getUrl方法，URL.put(“类名”，key)</li>
+</ul>
+]]></content>
+      <categories>
+        <category>JAVA</category>
+      </categories>
+      <tags>
+        <tag>Dubbo</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>JAVA程序打war包-idea</title>
     <url>/2022/09/19/JAVA%E7%A8%8B%E5%BA%8F%E6%89%93war%E5%8C%85-idea/</url>
     <content><![CDATA[<h1 id="JAVA程序打war包-idea"><a href="#JAVA程序打war包-idea" class="headerlink" title="JAVA程序打war包(idea)"></a>JAVA程序打war包(idea)</h1><span id="more"></span>
@@ -181,99 +305,6 @@
       </categories>
       <tags>
         <tag>hexo</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>BIO,NIO&amp;AIO认识以及Netty初识</title>
-    <url>/2022/09/20/BIO-NIO-AIO%E8%AE%A4%E8%AF%86/</url>
-    <content><![CDATA[<h1 id="BIO-NIO-amp-AIO认识及Netty初识"><a href="#BIO-NIO-amp-AIO认识及Netty初识" class="headerlink" title="BIO,NIO&amp;AIO认识及Netty初识"></a>BIO,NIO&amp;AIO认识及Netty初识</h1><span id="more"></span>
-
-<h3 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h3><p><strong>1.BIO(Blocking IO)</strong></p>
-<ul>
-<li>同步阻塞模型，一个线程对应一个连接，连接时(accept)阻塞等待客户端连接，读取信息(read)时阻塞，等待客户端发送消息。</li>
-</ul>
-<p><strong>2.NIO(Non Blocking IO)</strong></p>
-<ul>
-<li>同步非阻塞模型，利用多路复用机制，实现一个线程处理多个连接；客户端的连接请求会注册到多路复用器(selector)上，多路复用器<strong>同步等待</strong>轮询或回调到有请求时就用进行处理。</li>
-<li><strong>应用</strong>：常用于并发高，连接短，操作轻的情况，例如：聊天室</li>
-</ul>
-<p><strong>3.AIO(NIO 2.0)</strong></p>
-<ul>
-<li>异步非阻塞模型，由操作系统(底层OS)回调通知服务器<strong>异步</strong>处理IO事件</li>
-<li><strong>应用</strong>：连接时间长，操作重的场景。</li>
-</ul>
-<h3 id="NIO详解"><a href="#NIO详解" class="headerlink" title="NIO详解"></a>NIO详解</h3><p><strong>1.NIO的三大组件channel，buffer和selecter</strong></p>
-<ul>
-<li>channel为客户端和服务器的连接通道</li>
-<li>buffer数据结构为数组，buffer读取或写入channel的内容</li>
-<li>selecter多路复用器，channel注册到selecter，selecter分配空闲线程处理channel的IO事件</li>
-</ul>
-<p><strong>2.NioSelectorServe初识</strong></p>
-<ul>
-<li>Selector.open() &#x2F;&#x2F;创建多路复用器，生成一个Selector对象</li>
-<li>socketChannel.register(Selector，type) &#x2F;&#x2F;将channel注册到多路复用器上，并规定时间类型</li>
-<li>selector.select() &#x2F;&#x2F;阻塞等待注册的channel发生IO事件</li>
-<li>selector.selectedKeys() &#x2F;&#x2F;返回所有有IO事件的集合(SelectionKey),通过集合中的元素可以找到channel</li>
-</ul>
-<p><strong>3.epoll初识</strong></p>
-<ul>
-<li>JDK1.4以前用select(连接数为1024)或poll(连接数无上限)来实现NIO，JDK1.5开始使用epoll实现NIO。</li>
-<li>select()或poll()通过不断轮询事件，来确定是否发生了IO事件。</li>
-<li>epoll：OS感应到网络IO事件时，通过回调方法把事件放到一个文件中(可以理解为集合)，调用 selectedKeys时获取封装的事件。</li>
-</ul>
-<p><strong>3.为什么NIO使用较广</strong></p>
-<ul>
-<li>linux中，AIO的底层实现仍使用Epoll，性能上没有太大的优势</li>
-<li>linux中，AIO的实现还不够成熟</li>
-<li>Netty框架使用较多，Netty在NIO上做了很多异步的封装</li>
-</ul>
-<h3 id="Netty初识"><a href="#Netty初识" class="headerlink" title="Netty初识"></a>Netty初识</h3><p><strong>1.Netty概述</strong></p>
-<ul>
-<li>netty是一种异步的，事件驱动的网络通信框架。性能比较好，应用较广，Dubbo 协议默认使用 Netty 作为基础通信组件以及游戏行业使用较广。</li>
-</ul>
-<p><strong>2.线程模型</strong></p>
-<ul>
-<li><img src="/pictures/netty-01.png" alt="alt netty线程模型"></li>
-</ul>
-<p><strong>3.其他概念</strong></p>
-<ul>
-<li>Future和ChannelFuture可以注册监听，来确认操作的状态；ChannelHandler时处理IO事件的类</li>
-<li>ByteBuf:Netty常用的的缓存类，进行读写，ByteBuf 由一串字节数组构成，并提供了两个索引，一个用于读取数据，一个用于写入数据；读取时，它的 readerIndex（读索引）将会根据读取的字节数递增，写入时它的 writerIndex 也会根据写入的字节数进行递增。<strong>byteBuf可以自动扩容</strong></li>
-</ul>
-<p><strong>4.粘包和拆包</strong></p>
-<ul>
-<li><p>TCP是一个流协议，数据传输没有界限的，所以在数据传输中可能会被TCP拆分成多个包进行发送，也有可能把多个小的包封装成 一个大的数据包发送，这就是所谓的TCP粘包和拆包问题。</p>
-</li>
-<li><p>解决方案</p>
-<blockquote>
-<p>1.消息定长度，传输的数据大小固定长度，例如每段的长度固定为100字节，如果不够空位补空格</p>
-<p>2.在数据包尾部添加特殊分隔符，比如下划线。</p>
-<p>3.发送长度：发送每条数据的时候，将数据的长度一并发送，如：长度+消息 一起发送</p>
-</blockquote>
-</li>
-</ul>
-<p><strong>5.Netty心跳检测机制</strong></p>
-<ul>
-<li>IdleStateHandler可以设置超时时间</li>
-</ul>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 读超时  写超时  all超时</span></span><br><span class="line">pipeline.addLast(<span class="keyword">new</span> <span class="title class_">IdleStateHandler</span>(<span class="number">3</span>, <span class="number">0</span>, <span class="number">0</span>, TimeUnit.SECONDS));</span><br><span class="line"><span class="comment">// 超时之后会触发 userEventTriggered 方法</span></span><br><span class="line">READER_IDLE 读超时</span><br><span class="line">WRITER_IDLE 写超时</span><br><span class="line">ALL_IDLE    all超时</span><br></pre></td></tr></table></figure>
-
-<p><strong>6.Netty零拷贝</strong></p>
-<ul>
-<li><p>Netty的接收和发送ByteBuffer采用DIRECT BUFFERS，使用堆外直接内存进行Socket读写，不需要进行字节缓冲区的二次拷贝。</p>
-<blockquote>
-<p>使用直接内存的优缺点：</p>
-<p>优点：1.不占用堆内存空间，减少了发生GC的可能  2.本地IO会直接操作直接内存（直接内存&#x3D;&gt;系统调用&#x3D;&gt;硬盘&#x2F;网卡）,而非直接内存则需要二次拷贝（堆内 存&#x3D;&gt;直接内存&#x3D;&gt;系统调用&#x3D;&gt;硬盘&#x2F;网卡）</p>
-<p>缺点：1.初始分配较慢 2.没有JVM直接帮助管理内存，容易发生内存溢出。</p>
-</blockquote>
-</li>
-</ul>
-]]></content>
-      <categories>
-        <category>JAVA</category>
-      </categories>
-      <tags>
-        <tag>Netty</tag>
       </tags>
   </entry>
   <entry>
