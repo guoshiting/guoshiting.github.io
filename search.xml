@@ -205,10 +205,14 @@
 <ul>
 <li>服务端和客户端可以配置服务超时时间，如果只有一端配置了超时时间则时程序超时时间</li>
 <li>客户端超时之后会<strong>抛</strong>超时异常，但是服务端超时之后<strong>只</strong>打印⼀个超时⽇志</li>
+<li>异步调用也是有超时的，但是<strong>容错和mock</strong>（像同步那样设置时）不生效。</li>
 </ul>
 <p><strong>3.集群容错</strong>(默认：失败自动重试，<code>retries=&quot;2&quot;</code> 来设置重试次数(不含第一次))</p>
 <ul>
-<li><p>客户端调用失败(一般指超时,程序运行中throw Exception不会重试)之后，执行配置的容错策略，比如：重新调用其他的服务</p>
+<li><p>客户端调用失败(一般指RpcException(如:超时),程序运行中业务throw Exception不会重试)之后，执行配置的容错策略，比如：重新调用其他的服务</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">//服务端会把业务抛出的异常(超时会包装为RpcException)放到appResponse的Throwable exception属性中，并把异常包装为RuntimeException,异步调用没有容错机制</span></span><br><span class="line"><span class="comment">//mock机制判断异常时，代码：result.getException() instanceof RpcException</span></span><br><span class="line">result = <span class="built_in">this</span>.invoker.invoke(invocation);</span><br><span class="line"><span class="keyword">if</span>(result.getException() != <span class="literal">null</span> &amp;&amp; result.getException() <span class="keyword">instanceof</span> RpcException)&#123; mock返回&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">FailoverClusterInvoker</span>&lt;T&gt; <span class="keyword">extends</span> <span class="title class_">AbstractClusterInvoker</span>&lt;T&gt; &#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> Result <span class="title function_">doInvoke</span><span class="params">(Invocation invocation, <span class="keyword">final</span> List&lt;Invoker&lt;T&gt;&gt; invokers, LoadBalance loadbalance)</span> <span class="keyword">throws</span> 				RpcException &#123;</span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">0</span>; i &lt; len; i++) &#123;</span><br><span class="line">            <span class="keyword">try</span>&#123;</span><br><span class="line">                <span class="type">Result</span> <span class="variable">result</span> <span class="operator">=</span> invoker.invoke(invocation);</span><br><span class="line">			<span class="comment">//框架抛出的异常，服务端业务抛出的异常会进行封装</span></span><br><span class="line">            &#125; <span class="keyword">catch</span> (RpcException e) &#123;</span><br><span class="line">                <span class="keyword">if</span> (e.isBiz()) &#123; <span class="comment">// 业务异常</span></span><br><span class="line">                    <span class="keyword">throw</span> e;</span><br><span class="line">                &#125;</span><br><span class="line">                le = e;<span class="comment">//继续for循环</span></span><br><span class="line">            &#125; <span class="keyword">catch</span> (Throwable e) &#123;</span><br><span class="line">                le = <span class="keyword">new</span> <span class="title class_">RpcException</span>(e.getMessage(), e);<span class="comment">//继续for循环</span></span><br><span class="line">            &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">                providers.add(invoker.getUrl().getAddress());</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><img src="/pictures/dubbo-02.png" alt="alt dubbo-Exception"></p>
 </li>
 <li><p>集群容错模式：</p>
 <blockquote>
@@ -273,6 +277,8 @@
 <li>SPI文件中增加@Activate的类的全路径类名</li>
 </ul>
 </blockquote>
+</li>
+<li><p>dubbo调用时直接负载均衡获取Invoker类，然后进行调用，不会在查询注册信息，如果注册中心的注册信息发生改变时，Invoker就会改变。</p>
 </li>
 </ul>
 ]]></content>
