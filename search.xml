@@ -162,15 +162,32 @@
 <li>倒排索引：以字或词为关键字进行索引，表中关键字所对应的记录表项记录了出现这个字或词的所有文档，一个表项就是一个字表段，它记录该文档的ID和字符在该文档中出现的位置情况。</li>
 </ul>
 <h3 id="5-ES中概念"><a href="#5-ES中概念" class="headerlink" title="5.ES中概念"></a>5.ES中概念</h3><ul>
-<li>索引 index：相似文档的集合</li>
-<li>映射 mapping：文档的存储方式和限制，如某个字段的数据类型、默认 值、分词器、是否被索引等等</li>
-<li>字段Field：文档中的字段属性</li>
-<li>字段类型 ：字段Field的类型，常见：Text、Keyword、Byte等</li>
-<li>文档 document：类似一条记录。文档以JSON（Javascript Object  Notation）格式来表示</li>
-<li>集群 cluster：一个集群就是由一个或多个节点组织在一起，它们共同持有整个的数据，并一起提 供索引和搜索功能</li>
-<li>节点 node：一个节点是集群中的一个服务器，作为集群的一部分，它存储数据，参与集群的索引和搜索功能</li>
-<li>分片shards：由于存储数据较大，一个节点不能存储的话需要分片进行存储，水平分割&#x2F;扩展你的内容容量。</li>
-<li>副本replicas：主分片的数据备份，副本从来不和主分片在同一节点。</li>
+<li><p>索引 index：相似文档的集合</p>
+</li>
+<li><p>映射 mapping：文档的存储方式和限制，如某个字段的数据类型、默认 值、分词器、是否被索引等等</p>
+</li>
+<li><p>字段Field：文档中的字段属性</p>
+</li>
+<li><p>字段类型 ：字段Field的类型，常见：Text、Keyword、Byte等</p>
+</li>
+<li><p>文档 document：类似一条记录。文档以JSON（Javascript Object  Notation）格式来表示</p>
+</li>
+<li><p>集群 cluster：一个集群就是由一个或多个节点组织在一起，它们共同持有整个的数据，并一起提 供索引和搜索功能</p>
+</li>
+<li><p>节点 node：一个节点是集群中的一个服务器，作为集群的一部分，它存储数据，参与集群的索引和搜索功能</p>
+</li>
+<li><p>分片shards：由于存储数据较大，一个节点不能存储的话需要分片进行存储，水平分割&#x2F;扩展你的内容容量。</p>
+</li>
+<li><p>副本replicas：主分片的数据备份，副本从来不和主分片在同一节点。</p>
+</li>
+<li><p>文档中数据的类型</p>
+<blockquote>
+<p>字符串： text 和 keyword。</p>
+<p>数值型：long、integer、short、byte、double、float</p>
+<p>日期型：date</p>
+<p>布尔型：boolean</p>
+</blockquote>
+</li>
 </ul>
 <h3 id="6-基本操作"><a href="#6-基本操作" class="headerlink" title="6.基本操作"></a>6.基本操作</h3><ul>
 <li><p>索引操作</p>
@@ -208,154 +225,50 @@
 </blockquote>
 </li>
 </ul>
+<h3 id="7-DSL语言"><a href="#7-DSL语言" class="headerlink" title="7.DSL语言"></a>7.DSL语言</h3><ul>
+<li><p>无条件</p>
+<figure class="highlight json"><table><tr><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">    <span class="attr">&quot;query&quot;</span><span class="punctuation">:</span><span class="punctuation">&#123;</span></span><br><span class="line">        <span class="attr">&quot;match_all&quot;</span><span class="punctuation">:</span><span class="punctuation">&#123;</span><span class="punctuation">&#125;</span></span><br><span class="line">    <span class="punctuation">&#125;</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>简单查询</p>
+<blockquote>
+<ul>
+<li>term不会分词。keyword字段也不分词</li>
+<li>text字段会分词，而term不分词，所以term查询的条件必须是text字段分词后的<strong>某一个</strong>。text:中国北京，term:中国北京 时，如果text分词之后中国北京没有分为一个词，此时就查询不到</li>
+<li>match会被分词，text类型会分词</li>
+<li>match_phase会对输入做分词，但是需要结果中也包含所有的分词，而且顺序要 求一样。</li>
+<li>query_string和match类似，但是match需要指定字段名，query_string可以不指定字段，不指定时是在所有字段中搜索，范围更广泛。</li>
+</ul>
+</blockquote>
+<figure class="highlight json"><table><tr><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">    <span class="attr">&quot;query&quot;</span><span class="punctuation">:</span><span class="punctuation">&#123;</span></span><br><span class="line">        <span class="attr">&quot;term&quot;</span><span class="punctuation">:</span><span class="punctuation">&#123;</span> # term查询时不分词，match查询时分词</span><br><span class="line">            <span class="attr">&quot;name&quot;</span><span class="punctuation">:</span><span class="string">&quot;111&quot;</span></span><br><span class="line">        <span class="punctuation">&#125;</span></span><br><span class="line">    <span class="punctuation">&#125;</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br><span class="line"># <span class="string">&quot;address&quot;</span><span class="punctuation">,</span><span class="string">&quot;name&quot;</span>中分词查询张三</span><br><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">    <span class="attr">&quot;query&quot;</span><span class="punctuation">:</span><span class="punctuation">&#123;</span></span><br><span class="line">        <span class="attr">&quot;multi_match&quot;</span><span class="punctuation">:</span><span class="punctuation">&#123;</span> </span><br><span class="line">            <span class="attr">&quot;query&quot;</span><span class="punctuation">:</span><span class="string">&quot;张三&quot;</span><span class="punctuation">,</span></span><br><span class="line">            <span class="attr">&quot;fields&quot;</span><span class="punctuation">:</span><span class="punctuation">[</span><span class="string">&quot;address&quot;</span><span class="punctuation">,</span><span class="string">&quot;name&quot;</span><span class="punctuation">]</span></span><br><span class="line">        <span class="punctuation">&#125;</span></span><br><span class="line">    <span class="punctuation">&#125;</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br><span class="line"># 范围查询</span><br><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">    <span class="attr">&quot;query&quot;</span><span class="punctuation">:</span><span class="punctuation">&#123;</span></span><br><span class="line">        <span class="attr">&quot;range&quot;</span><span class="punctuation">:</span><span class="punctuation">&#123;</span> </span><br><span class="line">            <span class="attr">&quot;age&quot;</span><span class="punctuation">:</span><span class="punctuation">&#123;</span></span><br><span class="line">                <span class="attr">&quot;gte&quot;</span><span class="punctuation">:</span><span class="number">25</span> ## gte<span class="punctuation">:</span>大于等于 lte<span class="punctuation">:</span>小于等于 gt<span class="punctuation">:</span>大于 lt<span class="punctuation">:</span>小于</span><br><span class="line">            <span class="punctuation">&#125;</span></span><br><span class="line">        <span class="punctuation">&#125;</span></span><br><span class="line">    <span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;from&quot;</span><span class="punctuation">:</span> <span class="number">0</span><span class="punctuation">,</span> #分页</span><br><span class="line">	<span class="attr">&quot;size&quot;</span><span class="punctuation">:</span> <span class="number">2</span><span class="punctuation">,</span> #分页</span><br><span class="line">	<span class="attr">&quot;_source&quot;</span><span class="punctuation">:</span> <span class="punctuation">[</span><span class="string">&quot;name&quot;</span><span class="punctuation">,</span> <span class="string">&quot;age&quot;</span><span class="punctuation">,</span> <span class="string">&quot;book&quot;</span><span class="punctuation">]</span><span class="punctuation">,</span> #返回字段</span><br><span class="line">    <span class="attr">&quot;sort&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span><span class="attr">&quot;age&quot;</span><span class="punctuation">:</span><span class="string">&quot;desc&quot;</span><span class="punctuation">&#125;</span> # 排序</span><br><span class="line"></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>Filter过滤器方式查询，它的查询不会计算相关性分值，也不会对结果进 行排序, 因此效率会高一点，查询的结果可以被缓存。</p>
+<figure class="highlight json"><table><tr><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">    <span class="attr">&quot;query&quot;</span><span class="punctuation">:</span><span class="punctuation">&#123;</span></span><br><span class="line">        <span class="attr">&quot;filter&quot;</span><span class="punctuation">:</span><span class="punctuation">&#123;</span> </span><br><span class="line">            <span class="attr">&quot;term&quot;</span><span class="punctuation">:</span><span class="punctuation">&#123;</span> # term查询时不分词，match查询时分词</span><br><span class="line">                <span class="attr">&quot;name&quot;</span><span class="punctuation">:</span><span class="string">&quot;111&quot;</span></span><br><span class="line">            <span class="punctuation">&#125;</span></span><br><span class="line">        <span class="punctuation">&#125;</span></span><br><span class="line">    <span class="punctuation">&#125;</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure></li>
+</ul>
+<h3 id="其他"><a href="#其他" class="headerlink" title="其他"></a>其他</h3><ul>
+<li><p>对已存在的mapping映射进行修改</p>
+<blockquote>
+<p>新建索引–&gt;导入原有数据–&gt;为索引新建别名–&gt;删除旧索引</p>
+<figure class="highlight json"><table><tr><td class="code"><pre><span class="line">## 导入操作</span><br><span class="line">POST _reindex</span><br><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">    <span class="attr">&quot;source&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">        <span class="attr">&quot;index&quot;</span><span class="punctuation">:</span> <span class="string">&quot;旧索引&quot;</span></span><br><span class="line">    <span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;dest&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">        <span class="attr">&quot;index&quot;</span><span class="punctuation">:</span> <span class="string">&quot;新索引&quot;</span></span><br><span class="line">    <span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
+</blockquote>
+</li>
+<li><p>多个索引查询</p>
+<blockquote>
+<p>如果数据量较大，一个索引不方便存放的话，可以把两个索引或多个索引建一个相同的别名，用别名查询时就是查询多个索引。例如：user_2011和user_2022就可以建一个别名user</p>
+</blockquote>
+</li>
+<li><p>Elasticsearch乐观并发控制</p>
+<blockquote>
+<figure class="highlight json"><table><tr><td class="code"><pre><span class="line"># <span class="number">7</span>以前，使用version控制</span><br><span class="line">PUT /db_index/_doc/<span class="number">1</span>?version=<span class="number">1</span></span><br><span class="line"># <span class="number">7</span>和<span class="number">7</span>以后，if_seq_no=版本值&amp;if_primary_term=文档位置控制</span><br><span class="line">POST /db_index/_update/<span class="number">1</span>/?if_seq_no=<span class="number">5</span>&amp;if_primary_term=<span class="number">1</span></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+</blockquote>
+</li>
+</ul>
 ]]></content>
       <categories>
         <category>JAVA</category>
       </categories>
       <tags>
         <tag>ElasticSearch</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>JAVA程序打war包-idea</title>
-    <url>/2022/09/19/JAVA%E7%A8%8B%E5%BA%8F%E6%89%93war%E5%8C%85-idea/</url>
-    <content><![CDATA[<h1 id="JAVA程序打war包-idea"><a href="#JAVA程序打war包-idea" class="headerlink" title="JAVA程序打war包(idea)"></a>JAVA程序打war包(idea)</h1><span id="more"></span>
-
-<ul>
-<li><h2 id="war包设置"><a href="#war包设置" class="headerlink" title="war包设置"></a>war包设置</h2><blockquote>
-<p>1.File -&gt; Project Structure</p>
-</blockquote>
-</li>
-</ul>
-<p><img src="/pictures/2-1.png" alt="alt 2-1"></p>
-<p><img src="/pictures/2-2.png" alt="alt 2-2"></p>
-<ul>
-<li><h2 id="war包编译设置"><a href="#war包编译设置" class="headerlink" title="war包编译设置"></a>war包编译设置</h2></li>
-</ul>
-<blockquote>
-<p>1.设置工程打包路径</p>
-</blockquote>
-<p><img src="/pictures/2-3.png" alt="alt 2-3"></p>
-<blockquote>
-<p>2.加入class和lib</p>
-</blockquote>
-<p><img src="/pictures/2-4.png" alt="alt 2-4"></p>
-<p><img src="/pictures/2-5.png" alt="alt 2-5"></p>
-<ul>
-<li><h2 id="打包"><a href="#打包" class="headerlink" title="打包"></a>打包</h2></li>
-</ul>
-<blockquote>
-<p>Build -&gt; Build Artifacts -&gt; Build</p>
-</blockquote>
-<p><img src="/pictures/2-6.png" alt="alt 2-6"></p>
-<p><img src="/pictures/2-7.png" alt="alt 2-7"></p>
-<ul>
-<li><h2 id="注意设置java编译路径"><a href="#注意设置java编译路径" class="headerlink" title="注意设置java编译路径"></a>注意设置java编译路径</h2></li>
-</ul>
-<blockquote>
-<p>1.File -&gt; Project Structure -&gt; Project</p>
-</blockquote>
-<p><img src="/pictures/2-8.jpg" alt="alt 2-8"></p>
-]]></content>
-      <categories>
-        <category>idea使用</category>
-      </categories>
-      <tags>
-        <tag>IDEA</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>自动注入@Autowired和@Resource</title>
-    <url>/2022/09/19/%E8%87%AA%E5%8A%A8%E6%B3%A8%E5%85%A5-Autowired%E5%92%8C-Resource/</url>
-    <content><![CDATA[<h1 id="自动注入-Autowired和-Resource"><a href="#自动注入-Autowired和-Resource" class="headerlink" title="自动注入@Autowired和@Resource"></a>自动注入@Autowired和@Resource</h1><span id="more"></span>
-
-<h4 id="1-来源不同"><a href="#1-来源不同" class="headerlink" title="1.来源不同"></a>1.来源不同</h4><blockquote>
-<ul>
-<li>@Autowired来自Spring，全路径类名为：org.springframework.beans.factory.annotation.Autowired</li>
-<li>@Resource 来自JDK，全路径类名为：javax.annotation.Resource</li>
-</ul>
-</blockquote>
-<h4 id="2-注入方式不同"><a href="#2-注入方式不同" class="headerlink" title="2.注入方式不同"></a>2.注入方式不同</h4><blockquote>
-<p><del>大家的常识似乎为@Autowired是根据类型注入的，如果两个类实现同一个接口就不能用@Autowired</del>，<strong>但这个常识是错误的</strong></p>
-<p>@Autowired的注入方式为：</p>
-<ul>
-<li>如果查询结果刚好为一个，就将该bean装配给@Autowired指定的数据</li>
-<li>如果查询的结果不止一个，先根据 @Primary 来决策，其次是 @Priority 决策优先级</li>
-<li>最后是根据 Bean 名字的严格匹配来决策</li>
-</ul>
-<p><img src="/pictures/autowire.png" alt="alt 修改config"></p>
-<p>@Resource的注入方式为：</p>
-<ul>
-<li>如果没有指定name和type属性的话，默认首先使用属性名称作为bean name进行注入，如果查询不到，则使用属性的类型进行查找注入</li>
-<li>如果指定了name和type其中一个，就按照指定的来进行注入，找不到或者找到多个，都会抛出异常</li>
-<li>如果同时指定了name和type，则从Spring上下文中找到唯一匹配（类型和名称同时匹配）的bean进行装配，找不到则抛出异常</li>
-</ul>
-</blockquote>
-<h4 id="其他方面"><a href="#其他方面" class="headerlink" title="其他方面"></a>其他方面</h4><blockquote>
-<ul>
-<li><p>如果@Autowired想指定名称注入的话，一般用@Autowired+@Qualifie(“beanName”)的方式</p>
-</li>
-<li><p>@Autowired与@Resource都可以用来装配bean. 都可以写在字段上,或写在setter方法上。</p>
-</li>
-<li><p>@Autowired默认情况下必须要求依赖对象必须存在，如果要允许null值，可以设置它的required属性为false（@Autowired(required&#x3D;false)</p>
-</li>
-</ul>
-</blockquote>
-]]></content>
-      <categories>
-        <category>spring初识</category>
-      </categories>
-      <tags>
-        <tag>Spring</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>hexo-next新增文章</title>
-    <url>/2022/09/19/hexo-next%E6%96%B0%E5%A2%9E%E6%96%87%E7%AB%A0/</url>
-    <content><![CDATA[<h1 id="hexo-next新增文章"><a href="#hexo-next新增文章" class="headerlink" title="hexo-next新增文章"></a>hexo-next新增文章</h1><span id="more"></span>
-
-<h2 id="安装hexo"><a href="#安装hexo" class="headerlink" title="安装hexo"></a>安装hexo</h2><blockquote>
-<p>1.安装node.js和git</p>
-<p>2.安装hexo</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">#安装hexo</span><br><span class="line">npm install -g hexo</span><br><span class="line">#新建自己的项目文件夹(myproject)并进入自己的项目文件夹</span><br><span class="line">cd myproject</span><br><span class="line">hexo init</span><br><span class="line">#安装依赖</span><br><span class="line">npm install</span><br><span class="line">#hexo编译和启动</span><br><span class="line">hexo g</span><br><span class="line">hexo s</span><br><span class="line">#访问http://localhost:4000,查看hexo是否搭建成功</span><br></pre></td></tr></table></figure>
-
-<p>3.安装git插件</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">npm install hexo-deployer-git --save</span><br></pre></td></tr></table></figure>
-</blockquote>
-<h1 id="安装hexo-next"><a href="#安装hexo-next" class="headerlink" title="安装hexo-next"></a>安装hexo-next</h1><blockquote>
-<p>1.安装hexo-next插件</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">&gt;#先myproject目录下执行</span><br><span class="line">&gt;git clone https://github.com/theme-next/hexo-theme-next.git</span><br><span class="line">&gt;#修改myproject目录下的_conf.yml</span><br><span class="line">&gt;theme: next</span><br></pre></td></tr></table></figure>
-</blockquote>
-<p><img src="/pictures/update_hexo_config.png" alt="alt 修改config"></p>
-<h1 id="参数配置"><a href="#参数配置" class="headerlink" title="参数配置"></a>参数配置</h1><p>1.myproject&#x2F;_config.yml</p>
-<blockquote>
-<figure class="highlight yaml"><table><tr><td class="code"><pre><span class="line"><span class="comment">## 中文</span></span><br><span class="line"><span class="attr">language:</span> <span class="string">zh-CN</span></span><br><span class="line"><span class="comment">## 时间统计</span></span><br><span class="line"><span class="attr">symbols_count_time:</span></span><br><span class="line">  <span class="comment"># 文章字数统计</span></span><br><span class="line">  <span class="attr">symbols:</span> <span class="literal">true</span></span><br><span class="line">  <span class="comment"># 文章阅读时间统计</span></span><br><span class="line">  <span class="attr">time:</span> <span class="literal">true</span></span><br><span class="line">  <span class="comment"># 网站总字数统计</span></span><br><span class="line">  <span class="attr">total_symbols:</span> <span class="literal">true</span></span><br><span class="line">  <span class="comment"># 网站总阅读时间统计</span></span><br><span class="line">  <span class="attr">total_time:</span> <span class="literal">true</span></span><br><span class="line">  <span class="attr">exclude_codeblock:</span> <span class="literal">false</span></span><br><span class="line"><span class="comment">#搜索 防止部署之后一致加载搜索</span></span><br><span class="line"><span class="attr">search:</span></span><br><span class="line">  <span class="attr">path:</span> <span class="string">search.xml</span></span><br><span class="line">  <span class="attr">field:</span> <span class="string">post</span></span><br><span class="line">  <span class="attr">format:</span> <span class="string">html</span></span><br><span class="line">  <span class="attr">limit:</span> <span class="number">10000</span></span><br></pre></td></tr></table></figure>
-
-<p>2.myproject&#x2F;themes&#x2F;next&#x2F;_config.yml</p>
-<figure class="highlight yaml"><table><tr><td class="code"><pre><span class="line"><span class="comment">## 时间统计</span></span><br><span class="line"><span class="attr">symbols_count_time:</span></span><br><span class="line">  <span class="comment">## 是否另起一行</span></span><br><span class="line">  <span class="attr">separated_meta:</span> <span class="literal">true</span></span><br><span class="line">  <span class="comment">## 首页统计数量前是否显示文字</span></span><br><span class="line">  <span class="attr">item_text_post:</span> <span class="literal">true</span></span><br><span class="line">  <span class="comment">## 底部统计数量前是否显示文字</span></span><br><span class="line">  <span class="attr">item_text_total:</span> <span class="literal">false</span></span><br><span class="line">  <span class="comment">## 平均字长</span></span><br><span class="line">  <span class="attr">awl:</span> <span class="number">4</span></span><br><span class="line">  <span class="comment">## 每分钟阅读字数</span></span><br><span class="line">  <span class="attr">wpm:</span> <span class="number">300</span></span><br><span class="line">  <span class="comment"># 站点预览</span></span><br><span class="line"><span class="attr">avatar:</span></span><br><span class="line">  <span class="comment"># Replace the default image and set the url here.目录为source为根目录</span></span><br><span class="line">  <span class="attr">url:</span> <span class="string">/images/avatar.gif</span></span><br><span class="line">  <span class="comment"># If true, the avatar will be dispalyed in circle.</span></span><br><span class="line">  <span class="attr">rounded:</span> <span class="literal">true</span></span><br><span class="line">  <span class="comment"># If true, the avatar will be rotated with the cursor.</span></span><br><span class="line">  <span class="attr">rotated:</span> <span class="literal">false</span></span><br></pre></td></tr></table></figure>
-
-
-</blockquote>
-<h1 id="新建文章"><a href="#新建文章" class="headerlink" title="新建文章"></a>新建文章</h1><blockquote>
-<p>1.新建文章(文章名称:doc)</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">hexo new doc</span><br></pre></td></tr></table></figure>
-
-<p>2.使用markdown编辑器修改文章</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">#文章目录</span><br><span class="line">/myproject/_posts/doc</span><br></pre></td></tr></table></figure>
-</blockquote>
-<h1 id="发布文章"><a href="#发布文章" class="headerlink" title="发布文章"></a>发布文章</h1><blockquote>
-<p>1.修改myproject目录下的_conf.yml配置文件</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">#修改deploy属性</span><br></pre></td></tr></table></figure>
-
-<p><img src="/pictures/update_display_config.jpg" alt="alt 修改config"></p>
-<p>2.发布命令</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">hexo d</span><br></pre></td></tr></table></figure></blockquote>
-]]></content>
-      <categories>
-        <category>hexo</category>
-      </categories>
-      <tags>
-        <tag>hexo</tag>
       </tags>
   </entry>
   <entry>
@@ -473,6 +386,148 @@
       </categories>
       <tags>
         <tag>Dubbo</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>JAVA程序打war包-idea</title>
+    <url>/2022/09/19/JAVA%E7%A8%8B%E5%BA%8F%E6%89%93war%E5%8C%85-idea/</url>
+    <content><![CDATA[<h1 id="JAVA程序打war包-idea"><a href="#JAVA程序打war包-idea" class="headerlink" title="JAVA程序打war包(idea)"></a>JAVA程序打war包(idea)</h1><span id="more"></span>
+
+<ul>
+<li><h2 id="war包设置"><a href="#war包设置" class="headerlink" title="war包设置"></a>war包设置</h2><blockquote>
+<p>1.File -&gt; Project Structure</p>
+</blockquote>
+</li>
+</ul>
+<p><img src="/pictures/2-1.png" alt="alt 2-1"></p>
+<p><img src="/pictures/2-2.png" alt="alt 2-2"></p>
+<ul>
+<li><h2 id="war包编译设置"><a href="#war包编译设置" class="headerlink" title="war包编译设置"></a>war包编译设置</h2></li>
+</ul>
+<blockquote>
+<p>1.设置工程打包路径</p>
+</blockquote>
+<p><img src="/pictures/2-3.png" alt="alt 2-3"></p>
+<blockquote>
+<p>2.加入class和lib</p>
+</blockquote>
+<p><img src="/pictures/2-4.png" alt="alt 2-4"></p>
+<p><img src="/pictures/2-5.png" alt="alt 2-5"></p>
+<ul>
+<li><h2 id="打包"><a href="#打包" class="headerlink" title="打包"></a>打包</h2></li>
+</ul>
+<blockquote>
+<p>Build -&gt; Build Artifacts -&gt; Build</p>
+</blockquote>
+<p><img src="/pictures/2-6.png" alt="alt 2-6"></p>
+<p><img src="/pictures/2-7.png" alt="alt 2-7"></p>
+<ul>
+<li><h2 id="注意设置java编译路径"><a href="#注意设置java编译路径" class="headerlink" title="注意设置java编译路径"></a>注意设置java编译路径</h2></li>
+</ul>
+<blockquote>
+<p>1.File -&gt; Project Structure -&gt; Project</p>
+</blockquote>
+<p><img src="/pictures/2-8.jpg" alt="alt 2-8"></p>
+]]></content>
+      <categories>
+        <category>idea使用</category>
+      </categories>
+      <tags>
+        <tag>IDEA</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>hexo-next新增文章</title>
+    <url>/2022/09/19/hexo-next%E6%96%B0%E5%A2%9E%E6%96%87%E7%AB%A0/</url>
+    <content><![CDATA[<h1 id="hexo-next新增文章"><a href="#hexo-next新增文章" class="headerlink" title="hexo-next新增文章"></a>hexo-next新增文章</h1><span id="more"></span>
+
+<h2 id="安装hexo"><a href="#安装hexo" class="headerlink" title="安装hexo"></a>安装hexo</h2><blockquote>
+<p>1.安装node.js和git</p>
+<p>2.安装hexo</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">#安装hexo</span><br><span class="line">npm install -g hexo</span><br><span class="line">#新建自己的项目文件夹(myproject)并进入自己的项目文件夹</span><br><span class="line">cd myproject</span><br><span class="line">hexo init</span><br><span class="line">#安装依赖</span><br><span class="line">npm install</span><br><span class="line">#hexo编译和启动</span><br><span class="line">hexo g</span><br><span class="line">hexo s</span><br><span class="line">#访问http://localhost:4000,查看hexo是否搭建成功</span><br></pre></td></tr></table></figure>
+
+<p>3.安装git插件</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">npm install hexo-deployer-git --save</span><br></pre></td></tr></table></figure>
+</blockquote>
+<h1 id="安装hexo-next"><a href="#安装hexo-next" class="headerlink" title="安装hexo-next"></a>安装hexo-next</h1><blockquote>
+<p>1.安装hexo-next插件</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">&gt;#先myproject目录下执行</span><br><span class="line">&gt;git clone https://github.com/theme-next/hexo-theme-next.git</span><br><span class="line">&gt;#修改myproject目录下的_conf.yml</span><br><span class="line">&gt;theme: next</span><br></pre></td></tr></table></figure>
+</blockquote>
+<p><img src="/pictures/update_hexo_config.png" alt="alt 修改config"></p>
+<h1 id="参数配置"><a href="#参数配置" class="headerlink" title="参数配置"></a>参数配置</h1><p>1.myproject&#x2F;_config.yml</p>
+<blockquote>
+<figure class="highlight yaml"><table><tr><td class="code"><pre><span class="line"><span class="comment">## 中文</span></span><br><span class="line"><span class="attr">language:</span> <span class="string">zh-CN</span></span><br><span class="line"><span class="comment">## 时间统计</span></span><br><span class="line"><span class="attr">symbols_count_time:</span></span><br><span class="line">  <span class="comment"># 文章字数统计</span></span><br><span class="line">  <span class="attr">symbols:</span> <span class="literal">true</span></span><br><span class="line">  <span class="comment"># 文章阅读时间统计</span></span><br><span class="line">  <span class="attr">time:</span> <span class="literal">true</span></span><br><span class="line">  <span class="comment"># 网站总字数统计</span></span><br><span class="line">  <span class="attr">total_symbols:</span> <span class="literal">true</span></span><br><span class="line">  <span class="comment"># 网站总阅读时间统计</span></span><br><span class="line">  <span class="attr">total_time:</span> <span class="literal">true</span></span><br><span class="line">  <span class="attr">exclude_codeblock:</span> <span class="literal">false</span></span><br><span class="line"><span class="comment">#搜索 防止部署之后一致加载搜索</span></span><br><span class="line"><span class="attr">search:</span></span><br><span class="line">  <span class="attr">path:</span> <span class="string">search.xml</span></span><br><span class="line">  <span class="attr">field:</span> <span class="string">post</span></span><br><span class="line">  <span class="attr">format:</span> <span class="string">html</span></span><br><span class="line">  <span class="attr">limit:</span> <span class="number">10000</span></span><br></pre></td></tr></table></figure>
+
+<p>2.myproject&#x2F;themes&#x2F;next&#x2F;_config.yml</p>
+<figure class="highlight yaml"><table><tr><td class="code"><pre><span class="line"><span class="comment">## 时间统计</span></span><br><span class="line"><span class="attr">symbols_count_time:</span></span><br><span class="line">  <span class="comment">## 是否另起一行</span></span><br><span class="line">  <span class="attr">separated_meta:</span> <span class="literal">true</span></span><br><span class="line">  <span class="comment">## 首页统计数量前是否显示文字</span></span><br><span class="line">  <span class="attr">item_text_post:</span> <span class="literal">true</span></span><br><span class="line">  <span class="comment">## 底部统计数量前是否显示文字</span></span><br><span class="line">  <span class="attr">item_text_total:</span> <span class="literal">false</span></span><br><span class="line">  <span class="comment">## 平均字长</span></span><br><span class="line">  <span class="attr">awl:</span> <span class="number">4</span></span><br><span class="line">  <span class="comment">## 每分钟阅读字数</span></span><br><span class="line">  <span class="attr">wpm:</span> <span class="number">300</span></span><br><span class="line">  <span class="comment"># 站点预览</span></span><br><span class="line"><span class="attr">avatar:</span></span><br><span class="line">  <span class="comment"># Replace the default image and set the url here.目录为source为根目录</span></span><br><span class="line">  <span class="attr">url:</span> <span class="string">/images/avatar.gif</span></span><br><span class="line">  <span class="comment"># If true, the avatar will be dispalyed in circle.</span></span><br><span class="line">  <span class="attr">rounded:</span> <span class="literal">true</span></span><br><span class="line">  <span class="comment"># If true, the avatar will be rotated with the cursor.</span></span><br><span class="line">  <span class="attr">rotated:</span> <span class="literal">false</span></span><br></pre></td></tr></table></figure>
+
+
+</blockquote>
+<h1 id="新建文章"><a href="#新建文章" class="headerlink" title="新建文章"></a>新建文章</h1><blockquote>
+<p>1.新建文章(文章名称:doc)</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">hexo new doc</span><br></pre></td></tr></table></figure>
+
+<p>2.使用markdown编辑器修改文章</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">#文章目录</span><br><span class="line">/myproject/_posts/doc</span><br></pre></td></tr></table></figure>
+</blockquote>
+<h1 id="发布文章"><a href="#发布文章" class="headerlink" title="发布文章"></a>发布文章</h1><blockquote>
+<p>1.修改myproject目录下的_conf.yml配置文件</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">#修改deploy属性</span><br></pre></td></tr></table></figure>
+
+<p><img src="/pictures/update_display_config.jpg" alt="alt 修改config"></p>
+<p>2.发布命令</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">hexo d</span><br></pre></td></tr></table></figure></blockquote>
+]]></content>
+      <categories>
+        <category>hexo</category>
+      </categories>
+      <tags>
+        <tag>hexo</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>自动注入@Autowired和@Resource</title>
+    <url>/2022/09/19/%E8%87%AA%E5%8A%A8%E6%B3%A8%E5%85%A5-Autowired%E5%92%8C-Resource/</url>
+    <content><![CDATA[<h1 id="自动注入-Autowired和-Resource"><a href="#自动注入-Autowired和-Resource" class="headerlink" title="自动注入@Autowired和@Resource"></a>自动注入@Autowired和@Resource</h1><span id="more"></span>
+
+<h4 id="1-来源不同"><a href="#1-来源不同" class="headerlink" title="1.来源不同"></a>1.来源不同</h4><blockquote>
+<ul>
+<li>@Autowired来自Spring，全路径类名为：org.springframework.beans.factory.annotation.Autowired</li>
+<li>@Resource 来自JDK，全路径类名为：javax.annotation.Resource</li>
+</ul>
+</blockquote>
+<h4 id="2-注入方式不同"><a href="#2-注入方式不同" class="headerlink" title="2.注入方式不同"></a>2.注入方式不同</h4><blockquote>
+<p><del>大家的常识似乎为@Autowired是根据类型注入的，如果两个类实现同一个接口就不能用@Autowired</del>，<strong>但这个常识是错误的</strong></p>
+<p>@Autowired的注入方式为：</p>
+<ul>
+<li>如果查询结果刚好为一个，就将该bean装配给@Autowired指定的数据</li>
+<li>如果查询的结果不止一个，先根据 @Primary 来决策，其次是 @Priority 决策优先级</li>
+<li>最后是根据 Bean 名字的严格匹配来决策</li>
+</ul>
+<p><img src="/pictures/autowire.png" alt="alt 修改config"></p>
+<p>@Resource的注入方式为：</p>
+<ul>
+<li>如果没有指定name和type属性的话，默认首先使用属性名称作为bean name进行注入，如果查询不到，则使用属性的类型进行查找注入</li>
+<li>如果指定了name和type其中一个，就按照指定的来进行注入，找不到或者找到多个，都会抛出异常</li>
+<li>如果同时指定了name和type，则从Spring上下文中找到唯一匹配（类型和名称同时匹配）的bean进行装配，找不到则抛出异常</li>
+</ul>
+</blockquote>
+<h4 id="其他方面"><a href="#其他方面" class="headerlink" title="其他方面"></a>其他方面</h4><blockquote>
+<ul>
+<li><p>如果@Autowired想指定名称注入的话，一般用@Autowired+@Qualifie(“beanName”)的方式</p>
+</li>
+<li><p>@Autowired与@Resource都可以用来装配bean. 都可以写在字段上,或写在setter方法上。</p>
+</li>
+<li><p>@Autowired默认情况下必须要求依赖对象必须存在，如果要允许null值，可以设置它的required属性为false（@Autowired(required&#x3D;false)</p>
+</li>
+</ul>
+</blockquote>
+]]></content>
+      <categories>
+        <category>spring初识</category>
+      </categories>
+      <tags>
+        <tag>Spring</tag>
       </tags>
   </entry>
 </search>

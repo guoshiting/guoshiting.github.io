@@ -212,10 +212,16 @@
                 <i class="far fa-calendar"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
-              
 
-              <time title="创建时间：2022-10-15 20:35:14 / 修改时间：22:15:47" itemprop="dateCreated datePublished" datetime="2022-10-15T20:35:14+08:00">2022-10-15</time>
+              <time title="创建时间：2022-10-15 20:35:14" itemprop="dateCreated datePublished" datetime="2022-10-15T20:35:14+08:00">2022-10-15</time>
             </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-10-16 17:28:12" itemprop="dateModified" datetime="2022-10-16T17:28:12+08:00">2022-10-16</time>
+              </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
                 <i class="far fa-folder"></i>
@@ -232,14 +238,14 @@
                 <i class="far fa-file-word"></i>
               </span>
                 <span class="post-meta-item-text">本文字数：</span>
-              <span>1.8k</span>
+              <span>3.7k</span>
             </span>
             <span class="post-meta-item" title="阅读时长">
               <span class="post-meta-item-icon">
                 <i class="far fa-clock"></i>
               </span>
                 <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>2 分钟</span>
+              <span>3 分钟</span>
             </span>
 
         </div>
@@ -286,15 +292,32 @@
 <li>倒排索引：以字或词为关键字进行索引，表中关键字所对应的记录表项记录了出现这个字或词的所有文档，一个表项就是一个字表段，它记录该文档的ID和字符在该文档中出现的位置情况。</li>
 </ul>
 <h3 id="5-ES中概念"><a href="#5-ES中概念" class="headerlink" title="5.ES中概念"></a>5.ES中概念</h3><ul>
-<li>索引 index：相似文档的集合</li>
-<li>映射 mapping：文档的存储方式和限制，如某个字段的数据类型、默认 值、分词器、是否被索引等等</li>
-<li>字段Field：文档中的字段属性</li>
-<li>字段类型 ：字段Field的类型，常见：Text、Keyword、Byte等</li>
-<li>文档 document：类似一条记录。文档以JSON（Javascript Object  Notation）格式来表示</li>
-<li>集群 cluster：一个集群就是由一个或多个节点组织在一起，它们共同持有整个的数据，并一起提 供索引和搜索功能</li>
-<li>节点 node：一个节点是集群中的一个服务器，作为集群的一部分，它存储数据，参与集群的索引和搜索功能</li>
-<li>分片shards：由于存储数据较大，一个节点不能存储的话需要分片进行存储，水平分割&#x2F;扩展你的内容容量。</li>
-<li>副本replicas：主分片的数据备份，副本从来不和主分片在同一节点。</li>
+<li><p>索引 index：相似文档的集合</p>
+</li>
+<li><p>映射 mapping：文档的存储方式和限制，如某个字段的数据类型、默认 值、分词器、是否被索引等等</p>
+</li>
+<li><p>字段Field：文档中的字段属性</p>
+</li>
+<li><p>字段类型 ：字段Field的类型，常见：Text、Keyword、Byte等</p>
+</li>
+<li><p>文档 document：类似一条记录。文档以JSON（Javascript Object  Notation）格式来表示</p>
+</li>
+<li><p>集群 cluster：一个集群就是由一个或多个节点组织在一起，它们共同持有整个的数据，并一起提 供索引和搜索功能</p>
+</li>
+<li><p>节点 node：一个节点是集群中的一个服务器，作为集群的一部分，它存储数据，参与集群的索引和搜索功能</p>
+</li>
+<li><p>分片shards：由于存储数据较大，一个节点不能存储的话需要分片进行存储，水平分割&#x2F;扩展你的内容容量。</p>
+</li>
+<li><p>副本replicas：主分片的数据备份，副本从来不和主分片在同一节点。</p>
+</li>
+<li><p>文档中数据的类型</p>
+<blockquote>
+<p>字符串： text 和 keyword。</p>
+<p>数值型：long、integer、short、byte、double、float</p>
+<p>日期型：date</p>
+<p>布尔型：boolean</p>
+</blockquote>
+</li>
 </ul>
 <h3 id="6-基本操作"><a href="#6-基本操作" class="headerlink" title="6.基本操作"></a>6.基本操作</h3><ul>
 <li><p>索引操作</p>
@@ -329,6 +352,44 @@
 <li>POST和PUT都可以新增数据，POST新增数据可以不指定id，系统会自动生成id，PUT必须指定id</li>
 <li>POST和PUT的更新都需要指定id，es中的更新操作为先删除后修改。</li>
 </ul>
+</blockquote>
+</li>
+</ul>
+<h3 id="7-DSL语言"><a href="#7-DSL语言" class="headerlink" title="7.DSL语言"></a>7.DSL语言</h3><ul>
+<li><p>无条件</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">    <span class="attr">&quot;query&quot;</span><span class="punctuation">:</span><span class="punctuation">&#123;</span></span><br><span class="line">        <span class="attr">&quot;match_all&quot;</span><span class="punctuation">:</span><span class="punctuation">&#123;</span><span class="punctuation">&#125;</span></span><br><span class="line">    <span class="punctuation">&#125;</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>简单查询</p>
+<blockquote>
+<ul>
+<li>term不会分词。keyword字段也不分词</li>
+<li>text字段会分词，而term不分词，所以term查询的条件必须是text字段分词后的<strong>某一个</strong>。text:中国北京，term:中国北京 时，如果text分词之后中国北京没有分为一个词，此时就查询不到</li>
+<li>match会被分词，text类型会分词</li>
+<li>match_phase会对输入做分词，但是需要结果中也包含所有的分词，而且顺序要 求一样。</li>
+<li>query_string和match类似，但是match需要指定字段名，query_string可以不指定字段，不指定时是在所有字段中搜索，范围更广泛。</li>
+</ul>
+</blockquote>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">    <span class="attr">&quot;query&quot;</span><span class="punctuation">:</span><span class="punctuation">&#123;</span></span><br><span class="line">        <span class="attr">&quot;term&quot;</span><span class="punctuation">:</span><span class="punctuation">&#123;</span> # term查询时不分词，match查询时分词</span><br><span class="line">            <span class="attr">&quot;name&quot;</span><span class="punctuation">:</span><span class="string">&quot;111&quot;</span></span><br><span class="line">        <span class="punctuation">&#125;</span></span><br><span class="line">    <span class="punctuation">&#125;</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br><span class="line"># <span class="string">&quot;address&quot;</span><span class="punctuation">,</span><span class="string">&quot;name&quot;</span>中分词查询张三</span><br><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">    <span class="attr">&quot;query&quot;</span><span class="punctuation">:</span><span class="punctuation">&#123;</span></span><br><span class="line">        <span class="attr">&quot;multi_match&quot;</span><span class="punctuation">:</span><span class="punctuation">&#123;</span> </span><br><span class="line">            <span class="attr">&quot;query&quot;</span><span class="punctuation">:</span><span class="string">&quot;张三&quot;</span><span class="punctuation">,</span></span><br><span class="line">            <span class="attr">&quot;fields&quot;</span><span class="punctuation">:</span><span class="punctuation">[</span><span class="string">&quot;address&quot;</span><span class="punctuation">,</span><span class="string">&quot;name&quot;</span><span class="punctuation">]</span></span><br><span class="line">        <span class="punctuation">&#125;</span></span><br><span class="line">    <span class="punctuation">&#125;</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br><span class="line"># 范围查询</span><br><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">    <span class="attr">&quot;query&quot;</span><span class="punctuation">:</span><span class="punctuation">&#123;</span></span><br><span class="line">        <span class="attr">&quot;range&quot;</span><span class="punctuation">:</span><span class="punctuation">&#123;</span> </span><br><span class="line">            <span class="attr">&quot;age&quot;</span><span class="punctuation">:</span><span class="punctuation">&#123;</span></span><br><span class="line">                <span class="attr">&quot;gte&quot;</span><span class="punctuation">:</span><span class="number">25</span> ## gte<span class="punctuation">:</span>大于等于 lte<span class="punctuation">:</span>小于等于 gt<span class="punctuation">:</span>大于 lt<span class="punctuation">:</span>小于</span><br><span class="line">            <span class="punctuation">&#125;</span></span><br><span class="line">        <span class="punctuation">&#125;</span></span><br><span class="line">    <span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;from&quot;</span><span class="punctuation">:</span> <span class="number">0</span><span class="punctuation">,</span> #分页</span><br><span class="line">	<span class="attr">&quot;size&quot;</span><span class="punctuation">:</span> <span class="number">2</span><span class="punctuation">,</span> #分页</span><br><span class="line">	<span class="attr">&quot;_source&quot;</span><span class="punctuation">:</span> <span class="punctuation">[</span><span class="string">&quot;name&quot;</span><span class="punctuation">,</span> <span class="string">&quot;age&quot;</span><span class="punctuation">,</span> <span class="string">&quot;book&quot;</span><span class="punctuation">]</span><span class="punctuation">,</span> #返回字段</span><br><span class="line">    <span class="attr">&quot;sort&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span><span class="attr">&quot;age&quot;</span><span class="punctuation">:</span><span class="string">&quot;desc&quot;</span><span class="punctuation">&#125;</span> # 排序</span><br><span class="line"></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>Filter过滤器方式查询，它的查询不会计算相关性分值，也不会对结果进 行排序, 因此效率会高一点，查询的结果可以被缓存。</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">    <span class="attr">&quot;query&quot;</span><span class="punctuation">:</span><span class="punctuation">&#123;</span></span><br><span class="line">        <span class="attr">&quot;filter&quot;</span><span class="punctuation">:</span><span class="punctuation">&#123;</span> </span><br><span class="line">            <span class="attr">&quot;term&quot;</span><span class="punctuation">:</span><span class="punctuation">&#123;</span> # term查询时不分词，match查询时分词</span><br><span class="line">                <span class="attr">&quot;name&quot;</span><span class="punctuation">:</span><span class="string">&quot;111&quot;</span></span><br><span class="line">            <span class="punctuation">&#125;</span></span><br><span class="line">        <span class="punctuation">&#125;</span></span><br><span class="line">    <span class="punctuation">&#125;</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure></li>
+</ul>
+<h3 id="其他"><a href="#其他" class="headerlink" title="其他"></a>其他</h3><ul>
+<li><p>对已存在的mapping映射进行修改</p>
+<blockquote>
+<p>新建索引–&gt;导入原有数据–&gt;为索引新建别名–&gt;删除旧索引</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">## 导入操作</span><br><span class="line">POST _reindex</span><br><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">    <span class="attr">&quot;source&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">        <span class="attr">&quot;index&quot;</span><span class="punctuation">:</span> <span class="string">&quot;旧索引&quot;</span></span><br><span class="line">    <span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;dest&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">        <span class="attr">&quot;index&quot;</span><span class="punctuation">:</span> <span class="string">&quot;新索引&quot;</span></span><br><span class="line">    <span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
+</blockquote>
+</li>
+<li><p>多个索引查询</p>
+<blockquote>
+<p>如果数据量较大，一个索引不方便存放的话，可以把两个索引或多个索引建一个相同的别名，用别名查询时就是查询多个索引。例如：user_2011和user_2022就可以建一个别名user</p>
+</blockquote>
+</li>
+<li><p>Elasticsearch乐观并发控制</p>
+<blockquote>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"># <span class="number">7</span>以前，使用version控制</span><br><span class="line">PUT /db_index/_doc/<span class="number">1</span>?version=<span class="number">1</span></span><br><span class="line"># <span class="number">7</span>和<span class="number">7</span>以后，if_seq_no=版本值&amp;if_primary_term=文档位置控制</span><br><span class="line">POST /db_index/_update/<span class="number">1</span>/?if_seq_no=<span class="number">5</span>&amp;if_primary_term=<span class="number">1</span></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
 </blockquote>
 </li>
 </ul>
@@ -1022,12 +1083,12 @@
     <span class="post-meta-item-icon">
       <i class="fa fa-chart-area"></i>
     </span>
-    <span title="站点总字数">10k</span>
+    <span title="站点总字数">12k</span>
     <span class="post-meta-divider">|</span>
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="站点阅读时长">9 分钟</span>
+    <span title="站点阅读时长">11 分钟</span>
 </div>
   <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动
   </div>
