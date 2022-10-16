@@ -188,6 +188,12 @@
 <p>布尔型：boolean</p>
 </blockquote>
 </li>
+<li><p>Master节点：管理索引（创建索引、删除索引）、分配分片，维护元数据，管理集群节点状态，不负责数据写入和查询，比较轻量级，可以和DataNode分离，也可以不分离，多个master节点选举产生</p>
+</li>
+<li><p>DataNode节点：数据写入、数据检索，</p>
+</li>
+<li><p>客户端节点：当主节点和数据节点配置都设置data.master &#x3D; false和data.data&#x3D;false的时候，<strong>该节点只能处理路由请求，处理搜索，分发索引操作</strong>等</p>
+</li>
 </ul>
 <h3 id="6-基本操作"><a href="#6-基本操作" class="headerlink" title="6.基本操作"></a>6.基本操作</h3><ul>
 <li><p>索引操作</p>
@@ -229,7 +235,51 @@
 <li><p>无条件</p>
 <figure class="highlight json"><table><tr><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">    <span class="attr">&quot;query&quot;</span><span class="punctuation">:</span><span class="punctuation">&#123;</span></span><br><span class="line">        <span class="attr">&quot;match_all&quot;</span><span class="punctuation">:</span><span class="punctuation">&#123;</span><span class="punctuation">&#125;</span></span><br><span class="line">    <span class="punctuation">&#125;</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
 </li>
-<li><p>简单查询</p>
+<li><p>查询用词说明</p>
+<blockquote>
+<ul>
+<li><p>match : 通过match关键词模糊匹配条件内容</p>
+</li>
+<li><p>prefix : 前缀匹配</p>
+</li>
+<li><p>regexp : 通过正则表达式来匹配数据</p>
+</li>
+<li><p>match条件还支持以下参数：</p>
+<ul>
+<li>query : 指定匹配的值</li>
+<li>operator : 匹配条件类型，and或or</li>
+</ul>
+</li>
+<li><p>minmum_should_match : 指定最小匹配的数量</p>
+</li>
+<li><p>term : 单个条件相等</p>
+</li>
+<li><p>terms : 单个字段属于某个值数组内的值</p>
+</li>
+<li><p>range : 字段属于某个范围内的值</p>
+</li>
+<li><p>exists : 某个字段的值是否存在</p>
+</li>
+<li><p>ids : 通过ID批量查询</p>
+</li>
+<li><p>bool : 各条件之间有and,or或not的关系</p>
+<ul>
+<li>must : 各个条件都必须满足，即各条件是and的 关系</li>
+<li>should : 各个条件有一个满足即可，即各条件 是or的关系</li>
+<li>must_not : 不满足所有条件，即各条件是not的 关系</li>
+<li>filter : 不计算相关度评分，它不计算_score 即相关度评分，效率更高</li>
+</ul>
+</li>
+<li><p>constant_score : 不计算相关度评分</p>
+</li>
+<li><p>父子文档查询：parent&#x2F;child</p>
+</li>
+<li><p>嵌套文档查询: nested</p>
+</li>
+</ul>
+</blockquote>
+</li>
+<li><p>查询说明</p>
 <blockquote>
 <ul>
 <li>term不会分词。keyword字段也不分词</li>
@@ -239,10 +289,37 @@
 <li>query_string和match类似，但是match需要指定字段名，query_string可以不指定字段，不指定时是在所有字段中搜索，范围更广泛。</li>
 </ul>
 </blockquote>
-<figure class="highlight json"><table><tr><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">    <span class="attr">&quot;query&quot;</span><span class="punctuation">:</span><span class="punctuation">&#123;</span></span><br><span class="line">        <span class="attr">&quot;term&quot;</span><span class="punctuation">:</span><span class="punctuation">&#123;</span> # term查询时不分词，match查询时分词</span><br><span class="line">            <span class="attr">&quot;name&quot;</span><span class="punctuation">:</span><span class="string">&quot;111&quot;</span></span><br><span class="line">        <span class="punctuation">&#125;</span></span><br><span class="line">    <span class="punctuation">&#125;</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br><span class="line"># <span class="string">&quot;address&quot;</span><span class="punctuation">,</span><span class="string">&quot;name&quot;</span>中分词查询张三</span><br><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">    <span class="attr">&quot;query&quot;</span><span class="punctuation">:</span><span class="punctuation">&#123;</span></span><br><span class="line">        <span class="attr">&quot;multi_match&quot;</span><span class="punctuation">:</span><span class="punctuation">&#123;</span> </span><br><span class="line">            <span class="attr">&quot;query&quot;</span><span class="punctuation">:</span><span class="string">&quot;张三&quot;</span><span class="punctuation">,</span></span><br><span class="line">            <span class="attr">&quot;fields&quot;</span><span class="punctuation">:</span><span class="punctuation">[</span><span class="string">&quot;address&quot;</span><span class="punctuation">,</span><span class="string">&quot;name&quot;</span><span class="punctuation">]</span></span><br><span class="line">        <span class="punctuation">&#125;</span></span><br><span class="line">    <span class="punctuation">&#125;</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br><span class="line"># 范围查询</span><br><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">    <span class="attr">&quot;query&quot;</span><span class="punctuation">:</span><span class="punctuation">&#123;</span></span><br><span class="line">        <span class="attr">&quot;range&quot;</span><span class="punctuation">:</span><span class="punctuation">&#123;</span> </span><br><span class="line">            <span class="attr">&quot;age&quot;</span><span class="punctuation">:</span><span class="punctuation">&#123;</span></span><br><span class="line">                <span class="attr">&quot;gte&quot;</span><span class="punctuation">:</span><span class="number">25</span> ## gte<span class="punctuation">:</span>大于等于 lte<span class="punctuation">:</span>小于等于 gt<span class="punctuation">:</span>大于 lt<span class="punctuation">:</span>小于</span><br><span class="line">            <span class="punctuation">&#125;</span></span><br><span class="line">        <span class="punctuation">&#125;</span></span><br><span class="line">    <span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;from&quot;</span><span class="punctuation">:</span> <span class="number">0</span><span class="punctuation">,</span> #分页</span><br><span class="line">	<span class="attr">&quot;size&quot;</span><span class="punctuation">:</span> <span class="number">2</span><span class="punctuation">,</span> #分页</span><br><span class="line">	<span class="attr">&quot;_source&quot;</span><span class="punctuation">:</span> <span class="punctuation">[</span><span class="string">&quot;name&quot;</span><span class="punctuation">,</span> <span class="string">&quot;age&quot;</span><span class="punctuation">,</span> <span class="string">&quot;book&quot;</span><span class="punctuation">]</span><span class="punctuation">,</span> #返回字段</span><br><span class="line">    <span class="attr">&quot;sort&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span><span class="attr">&quot;age&quot;</span><span class="punctuation">:</span><span class="string">&quot;desc&quot;</span><span class="punctuation">&#125;</span> # 排序</span><br><span class="line"></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight json"><table><tr><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">    <span class="attr">&quot;query&quot;</span><span class="punctuation">:</span><span class="punctuation">&#123;</span></span><br><span class="line">        <span class="attr">&quot;term&quot;</span><span class="punctuation">:</span><span class="punctuation">&#123;</span> # term查询时不分词，match查询时分词</span><br><span class="line">            <span class="attr">&quot;name&quot;</span><span class="punctuation">:</span><span class="string">&quot;111&quot;</span></span><br><span class="line">        <span class="punctuation">&#125;</span></span><br><span class="line">    <span class="punctuation">&#125;</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">    <span class="attr">&quot;query&quot;</span><span class="punctuation">:</span><span class="punctuation">&#123;</span></span><br><span class="line">        <span class="attr">&quot;match&quot;</span><span class="punctuation">:</span><span class="punctuation">&#123;</span> </span><br><span class="line">            <span class="attr">&quot;name&quot;</span><span class="punctuation">:</span><span class="punctuation">&#123;</span></span><br><span class="line">               <span class="attr">&quot;query&quot;</span><span class="punctuation">:</span><span class="string">&quot;wo men&quot;</span><span class="punctuation">,</span></span><br><span class="line">                <span class="attr">&quot;operator&quot;</span><span class="punctuation">:</span><span class="string">&quot;and&quot;</span> # 分词之后的词都包含  or：分词之后的词最少包含一个</span><br><span class="line">            <span class="punctuation">&#125;</span></span><br><span class="line">        <span class="punctuation">&#125;</span></span><br><span class="line">    <span class="punctuation">&#125;</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br><span class="line"># <span class="string">&quot;address&quot;</span><span class="punctuation">,</span><span class="string">&quot;name&quot;</span>中分词查询张三</span><br><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">    <span class="attr">&quot;query&quot;</span><span class="punctuation">:</span><span class="punctuation">&#123;</span></span><br><span class="line">        <span class="attr">&quot;multi_match&quot;</span><span class="punctuation">:</span><span class="punctuation">&#123;</span> </span><br><span class="line">            <span class="attr">&quot;query&quot;</span><span class="punctuation">:</span><span class="string">&quot;张三&quot;</span><span class="punctuation">,</span></span><br><span class="line">            <span class="attr">&quot;fields&quot;</span><span class="punctuation">:</span><span class="punctuation">[</span><span class="string">&quot;address&quot;</span><span class="punctuation">,</span><span class="string">&quot;name&quot;</span><span class="punctuation">]</span></span><br><span class="line">        <span class="punctuation">&#125;</span></span><br><span class="line">    <span class="punctuation">&#125;</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br><span class="line"># 范围查询</span><br><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">    <span class="attr">&quot;query&quot;</span><span class="punctuation">:</span><span class="punctuation">&#123;</span></span><br><span class="line">        <span class="attr">&quot;range&quot;</span><span class="punctuation">:</span><span class="punctuation">&#123;</span> </span><br><span class="line">            <span class="attr">&quot;age&quot;</span><span class="punctuation">:</span><span class="punctuation">&#123;</span></span><br><span class="line">                <span class="attr">&quot;gte&quot;</span><span class="punctuation">:</span><span class="number">25</span> ## gte<span class="punctuation">:</span>大于等于 lte<span class="punctuation">:</span>小于等于 gt<span class="punctuation">:</span>大于 lt<span class="punctuation">:</span>小于</span><br><span class="line">            <span class="punctuation">&#125;</span></span><br><span class="line">        <span class="punctuation">&#125;</span></span><br><span class="line">    <span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;from&quot;</span><span class="punctuation">:</span> <span class="number">0</span><span class="punctuation">,</span> #分页</span><br><span class="line">	<span class="attr">&quot;size&quot;</span><span class="punctuation">:</span> <span class="number">2</span><span class="punctuation">,</span> #分页</span><br><span class="line">	<span class="attr">&quot;_source&quot;</span><span class="punctuation">:</span> <span class="punctuation">[</span><span class="string">&quot;name&quot;</span><span class="punctuation">,</span> <span class="string">&quot;age&quot;</span><span class="punctuation">,</span> <span class="string">&quot;book&quot;</span><span class="punctuation">]</span><span class="punctuation">,</span> #返回字段</span><br><span class="line">    <span class="attr">&quot;sort&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span><span class="attr">&quot;age&quot;</span><span class="punctuation">:</span><span class="string">&quot;desc&quot;</span><span class="punctuation">&#125;</span> # 排序</span><br><span class="line"></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
 </li>
 <li><p>Filter过滤器方式查询，它的查询不会计算相关性分值，也不会对结果进 行排序, 因此效率会高一点，查询的结果可以被缓存。</p>
 <figure class="highlight json"><table><tr><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">    <span class="attr">&quot;query&quot;</span><span class="punctuation">:</span><span class="punctuation">&#123;</span></span><br><span class="line">        <span class="attr">&quot;filter&quot;</span><span class="punctuation">:</span><span class="punctuation">&#123;</span> </span><br><span class="line">            <span class="attr">&quot;term&quot;</span><span class="punctuation">:</span><span class="punctuation">&#123;</span> # term查询时不分词，match查询时分词</span><br><span class="line">                <span class="attr">&quot;name&quot;</span><span class="punctuation">:</span><span class="string">&quot;111&quot;</span></span><br><span class="line">            <span class="punctuation">&#125;</span></span><br><span class="line">        <span class="punctuation">&#125;</span></span><br><span class="line">    <span class="punctuation">&#125;</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure></li>
+</ul>
+<h3 id="8-ES的写入和查询已经实时查询"><a href="#8-ES的写入和查询已经实时查询" class="headerlink" title="8.ES的写入和查询已经实时查询"></a>8.ES的写入和查询已经实时查询</h3><ul>
+<li><p><strong>写入流程</strong></p>
+<blockquote>
+<p>1.客户端选择任意一个DataNode发送请求，例如：node2。此时，node2就成为一个Coordinating node（协调节点）</p>
+<p>2.计算得到文档要写入的分片,进行路由，将请求转发给对应的primary shard所在的(比如：node1)</p>
+<p>3.node1节点上的Primary Shard处理请求，写入数据到索引库中，并将数据同步到 Replica shard </p>
+<p>4.Primary Shard和Replica Shard都保存好了文档，返回请求到客户端client</p>
+</blockquote>
+</li>
+<li><p><strong>查询流程</strong></p>
+<blockquote>
+<p>1.client发起查询请求，某个DataNode接收到请求，该DataNode就会成为协调节点 （Coordinating Node） </p>
+<p>2.协调节点（Coordinating Node）将查询请求广播到每一个数据节点，这些数据节点的分片会处理该查询请求 </p>
+<p>3.每个分片进行数据查询，将符合条件的数据放在一个优先队列中，并将这些数据的文档ID、节点信息、分片信息返回给协调节点 </p>
+<p>4.协调节点将所有的结果进行汇总，并进行全局排序</p>
+<p>5.协调节点向包含这些文档ID的分片发送get请求，对应的分片将文档数据返回给协调节点，最后协调节点将数据返回给客户端</p>
+</blockquote>
+</li>
+<li><p><strong>Elasticsearch准实时索引实现</strong></p>
+<blockquote>
+<p>1.当数据写入到ES分片时，会首先写入到内存中，然后通过内存的buffer生成一个Segment，并刷到文件系统缓存中，数据可以被检索（注意不是直接刷到磁盘)ES中默认1秒，refresh一次 </p>
+<p>2.在写入到内存中的同时，也会记录translog日志，在refresh期间出现异常，会根据translog来进行数据恢复等到文件系统缓存中的segment数据都刷到磁盘中，清空translog文件 ,translog文件只记录为刷新到磁盘的数据操作</p>
+<p>3.ES默认每隔30分钟会将文件系统缓存的数据刷入到磁盘</p>
+<p>4.Segment太多时，ES定期会将多个segment合并成为大的segment，减少索引查询时IO开销，此阶段ES会真正的物理删除（之前执行过的delete的数据）</p>
+</blockquote>
+</li>
 </ul>
 <h3 id="其他"><a href="#其他" class="headerlink" title="其他"></a>其他</h3><ul>
 <li><p>对已存在的mapping映射进行修改</p>
@@ -258,7 +335,7 @@
 </li>
 <li><p>Elasticsearch乐观并发控制</p>
 <blockquote>
-<figure class="highlight json"><table><tr><td class="code"><pre><span class="line"># <span class="number">7</span>以前，使用version控制</span><br><span class="line">PUT /db_index/_doc/<span class="number">1</span>?version=<span class="number">1</span></span><br><span class="line"># <span class="number">7</span>和<span class="number">7</span>以后，if_seq_no=版本值&amp;if_primary_term=文档位置控制</span><br><span class="line">POST /db_index/_update/<span class="number">1</span>/?if_seq_no=<span class="number">5</span>&amp;if_primary_term=<span class="number">1</span></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<figure class="highlight json"><table><tr><td class="code"><pre><span class="line"># <span class="number">7</span>以前，使用version控制</span><br><span class="line">PUT /db_index/_doc/<span class="number">1</span>?version=<span class="number">1</span></span><br><span class="line"># <span class="number">7</span>和<span class="number">7</span>以后，if_seq_no=版本值&amp;if_primary_term=分片计数，每当Primary Shard发生重新分配，_primary_term就会加<span class="number">1</span>，version属于当前这条数据，而seq_no属于整个index</span><br><span class="line">POST /db_index/_update/<span class="number">1</span>/?if_seq_no=<span class="number">5</span>&amp;if_primary_term=<span class="number">1</span></span><br><span class="line"></span><br></pre></td></tr></table></figure>
 
 </blockquote>
 </li>
@@ -269,6 +346,54 @@
       </categories>
       <tags>
         <tag>ElasticSearch</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>JAVA程序打war包-idea</title>
+    <url>/2022/09/19/JAVA%E7%A8%8B%E5%BA%8F%E6%89%93war%E5%8C%85-idea/</url>
+    <content><![CDATA[<h1 id="JAVA程序打war包-idea"><a href="#JAVA程序打war包-idea" class="headerlink" title="JAVA程序打war包(idea)"></a>JAVA程序打war包(idea)</h1><span id="more"></span>
+
+<ul>
+<li><h2 id="war包设置"><a href="#war包设置" class="headerlink" title="war包设置"></a>war包设置</h2><blockquote>
+<p>1.File -&gt; Project Structure</p>
+</blockquote>
+</li>
+</ul>
+<p><img src="/pictures/2-1.png" alt="alt 2-1"></p>
+<p><img src="/pictures/2-2.png" alt="alt 2-2"></p>
+<ul>
+<li><h2 id="war包编译设置"><a href="#war包编译设置" class="headerlink" title="war包编译设置"></a>war包编译设置</h2></li>
+</ul>
+<blockquote>
+<p>1.设置工程打包路径</p>
+</blockquote>
+<p><img src="/pictures/2-3.png" alt="alt 2-3"></p>
+<blockquote>
+<p>2.加入class和lib</p>
+</blockquote>
+<p><img src="/pictures/2-4.png" alt="alt 2-4"></p>
+<p><img src="/pictures/2-5.png" alt="alt 2-5"></p>
+<ul>
+<li><h2 id="打包"><a href="#打包" class="headerlink" title="打包"></a>打包</h2></li>
+</ul>
+<blockquote>
+<p>Build -&gt; Build Artifacts -&gt; Build</p>
+</blockquote>
+<p><img src="/pictures/2-6.png" alt="alt 2-6"></p>
+<p><img src="/pictures/2-7.png" alt="alt 2-7"></p>
+<ul>
+<li><h2 id="注意设置java编译路径"><a href="#注意设置java编译路径" class="headerlink" title="注意设置java编译路径"></a>注意设置java编译路径</h2></li>
+</ul>
+<blockquote>
+<p>1.File -&gt; Project Structure -&gt; Project</p>
+</blockquote>
+<p><img src="/pictures/2-8.jpg" alt="alt 2-8"></p>
+]]></content>
+      <categories>
+        <category>idea使用</category>
+      </categories>
+      <tags>
+        <tag>IDEA</tag>
       </tags>
   </entry>
   <entry>
@@ -389,51 +514,48 @@
       </tags>
   </entry>
   <entry>
-    <title>JAVA程序打war包-idea</title>
-    <url>/2022/09/19/JAVA%E7%A8%8B%E5%BA%8F%E6%89%93war%E5%8C%85-idea/</url>
-    <content><![CDATA[<h1 id="JAVA程序打war包-idea"><a href="#JAVA程序打war包-idea" class="headerlink" title="JAVA程序打war包(idea)"></a>JAVA程序打war包(idea)</h1><span id="more"></span>
+    <title>自动注入@Autowired和@Resource</title>
+    <url>/2022/09/19/%E8%87%AA%E5%8A%A8%E6%B3%A8%E5%85%A5-Autowired%E5%92%8C-Resource/</url>
+    <content><![CDATA[<h1 id="自动注入-Autowired和-Resource"><a href="#自动注入-Autowired和-Resource" class="headerlink" title="自动注入@Autowired和@Resource"></a>自动注入@Autowired和@Resource</h1><span id="more"></span>
 
+<h4 id="1-来源不同"><a href="#1-来源不同" class="headerlink" title="1.来源不同"></a>1.来源不同</h4><blockquote>
 <ul>
-<li><h2 id="war包设置"><a href="#war包设置" class="headerlink" title="war包设置"></a>war包设置</h2><blockquote>
-<p>1.File -&gt; Project Structure</p>
+<li>@Autowired来自Spring，全路径类名为：org.springframework.beans.factory.annotation.Autowired</li>
+<li>@Resource 来自JDK，全路径类名为：javax.annotation.Resource</li>
+</ul>
 </blockquote>
+<h4 id="2-注入方式不同"><a href="#2-注入方式不同" class="headerlink" title="2.注入方式不同"></a>2.注入方式不同</h4><blockquote>
+<p><del>大家的常识似乎为@Autowired是根据类型注入的，如果两个类实现同一个接口就不能用@Autowired</del>，<strong>但这个常识是错误的</strong></p>
+<p>@Autowired的注入方式为：</p>
+<ul>
+<li>如果查询结果刚好为一个，就将该bean装配给@Autowired指定的数据</li>
+<li>如果查询的结果不止一个，先根据 @Primary 来决策，其次是 @Priority 决策优先级</li>
+<li>最后是根据 Bean 名字的严格匹配来决策</li>
+</ul>
+<p><img src="/pictures/autowire.png" alt="alt 修改config"></p>
+<p>@Resource的注入方式为：</p>
+<ul>
+<li>如果没有指定name和type属性的话，默认首先使用属性名称作为bean name进行注入，如果查询不到，则使用属性的类型进行查找注入</li>
+<li>如果指定了name和type其中一个，就按照指定的来进行注入，找不到或者找到多个，都会抛出异常</li>
+<li>如果同时指定了name和type，则从Spring上下文中找到唯一匹配（类型和名称同时匹配）的bean进行装配，找不到则抛出异常</li>
+</ul>
+</blockquote>
+<h4 id="其他方面"><a href="#其他方面" class="headerlink" title="其他方面"></a>其他方面</h4><blockquote>
+<ul>
+<li><p>如果@Autowired想指定名称注入的话，一般用@Autowired+@Qualifie(“beanName”)的方式</p>
+</li>
+<li><p>@Autowired与@Resource都可以用来装配bean. 都可以写在字段上,或写在setter方法上。</p>
+</li>
+<li><p>@Autowired默认情况下必须要求依赖对象必须存在，如果要允许null值，可以设置它的required属性为false（@Autowired(required&#x3D;false)</p>
 </li>
 </ul>
-<p><img src="/pictures/2-1.png" alt="alt 2-1"></p>
-<p><img src="/pictures/2-2.png" alt="alt 2-2"></p>
-<ul>
-<li><h2 id="war包编译设置"><a href="#war包编译设置" class="headerlink" title="war包编译设置"></a>war包编译设置</h2></li>
-</ul>
-<blockquote>
-<p>1.设置工程打包路径</p>
 </blockquote>
-<p><img src="/pictures/2-3.png" alt="alt 2-3"></p>
-<blockquote>
-<p>2.加入class和lib</p>
-</blockquote>
-<p><img src="/pictures/2-4.png" alt="alt 2-4"></p>
-<p><img src="/pictures/2-5.png" alt="alt 2-5"></p>
-<ul>
-<li><h2 id="打包"><a href="#打包" class="headerlink" title="打包"></a>打包</h2></li>
-</ul>
-<blockquote>
-<p>Build -&gt; Build Artifacts -&gt; Build</p>
-</blockquote>
-<p><img src="/pictures/2-6.png" alt="alt 2-6"></p>
-<p><img src="/pictures/2-7.png" alt="alt 2-7"></p>
-<ul>
-<li><h2 id="注意设置java编译路径"><a href="#注意设置java编译路径" class="headerlink" title="注意设置java编译路径"></a>注意设置java编译路径</h2></li>
-</ul>
-<blockquote>
-<p>1.File -&gt; Project Structure -&gt; Project</p>
-</blockquote>
-<p><img src="/pictures/2-8.jpg" alt="alt 2-8"></p>
 ]]></content>
       <categories>
-        <category>idea使用</category>
+        <category>spring初识</category>
       </categories>
       <tags>
-        <tag>IDEA</tag>
+        <tag>Spring</tag>
       </tags>
   </entry>
   <entry>
@@ -483,51 +605,6 @@
       </categories>
       <tags>
         <tag>hexo</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>自动注入@Autowired和@Resource</title>
-    <url>/2022/09/19/%E8%87%AA%E5%8A%A8%E6%B3%A8%E5%85%A5-Autowired%E5%92%8C-Resource/</url>
-    <content><![CDATA[<h1 id="自动注入-Autowired和-Resource"><a href="#自动注入-Autowired和-Resource" class="headerlink" title="自动注入@Autowired和@Resource"></a>自动注入@Autowired和@Resource</h1><span id="more"></span>
-
-<h4 id="1-来源不同"><a href="#1-来源不同" class="headerlink" title="1.来源不同"></a>1.来源不同</h4><blockquote>
-<ul>
-<li>@Autowired来自Spring，全路径类名为：org.springframework.beans.factory.annotation.Autowired</li>
-<li>@Resource 来自JDK，全路径类名为：javax.annotation.Resource</li>
-</ul>
-</blockquote>
-<h4 id="2-注入方式不同"><a href="#2-注入方式不同" class="headerlink" title="2.注入方式不同"></a>2.注入方式不同</h4><blockquote>
-<p><del>大家的常识似乎为@Autowired是根据类型注入的，如果两个类实现同一个接口就不能用@Autowired</del>，<strong>但这个常识是错误的</strong></p>
-<p>@Autowired的注入方式为：</p>
-<ul>
-<li>如果查询结果刚好为一个，就将该bean装配给@Autowired指定的数据</li>
-<li>如果查询的结果不止一个，先根据 @Primary 来决策，其次是 @Priority 决策优先级</li>
-<li>最后是根据 Bean 名字的严格匹配来决策</li>
-</ul>
-<p><img src="/pictures/autowire.png" alt="alt 修改config"></p>
-<p>@Resource的注入方式为：</p>
-<ul>
-<li>如果没有指定name和type属性的话，默认首先使用属性名称作为bean name进行注入，如果查询不到，则使用属性的类型进行查找注入</li>
-<li>如果指定了name和type其中一个，就按照指定的来进行注入，找不到或者找到多个，都会抛出异常</li>
-<li>如果同时指定了name和type，则从Spring上下文中找到唯一匹配（类型和名称同时匹配）的bean进行装配，找不到则抛出异常</li>
-</ul>
-</blockquote>
-<h4 id="其他方面"><a href="#其他方面" class="headerlink" title="其他方面"></a>其他方面</h4><blockquote>
-<ul>
-<li><p>如果@Autowired想指定名称注入的话，一般用@Autowired+@Qualifie(“beanName”)的方式</p>
-</li>
-<li><p>@Autowired与@Resource都可以用来装配bean. 都可以写在字段上,或写在setter方法上。</p>
-</li>
-<li><p>@Autowired默认情况下必须要求依赖对象必须存在，如果要允许null值，可以设置它的required属性为false（@Autowired(required&#x3D;false)</p>
-</li>
-</ul>
-</blockquote>
-]]></content>
-      <categories>
-        <category>spring初识</category>
-      </categories>
-      <tags>
-        <tag>Spring</tag>
       </tags>
   </entry>
 </search>
