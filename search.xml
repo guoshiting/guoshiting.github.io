@@ -1,6 +1,37 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title>Dubbo中SPI机制</title>
+    <url>/2022/10/09/Dubbo%E4%B8%ADSPI%E6%9C%BA%E5%88%B6/</url>
+    <content><![CDATA[<h1 id="Dubbo中SPI机制"><a href="#Dubbo中SPI机制" class="headerlink" title="Dubbo中SPI机制"></a>Dubbo中SPI机制</h1><span id="more"></span>
+
+<h3 id="JAVA的SPI"><a href="#JAVA的SPI" class="headerlink" title="JAVA的SPI"></a>JAVA的SPI</h3><ul>
+<li>SPI机制：是一种将服务接口与服务实现分离以达到解耦、提升了程序可扩展性的机制；通过本地的注册发现获取到具体的实现类，轻松可插拔</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 1.classpath下新建META-INF/services目录中新建接口全路径命名的文件,文件内写入SPI接口的实现类</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123;</span><br><span class="line">    ServiceLoader&lt;SpiInterface&gt; load = ServiceLoader.load(SpiInterface.class);</span><br><span class="line">    Iterator&lt;SpiInterface&gt; iterator = load.iterator();   </span><br><span class="line">    <span class="keyword">while</span> (iterator.hasNext()) &#123;</span><br><span class="line">       <span class="type">SpiInterface</span> <span class="variable">next</span> <span class="operator">=</span> iterator.next();</span><br><span class="line">       next.test(<span class="string">&quot;SPI demo&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>SPI使用例子：jdbc的jar包</li>
+</ul>
+<h3 id="Dubbo中SPI"><a href="#Dubbo中SPI" class="headerlink" title="Dubbo中SPI"></a>Dubbo中SPI</h3><ul>
+<li>例子:</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">ExtensionLoader&lt;Protocol&gt; extensionLoader = ExtensionLoader.getExtensionLoader(Protocol.class);</span><br><span class="line"><span class="type">Protocol</span> <span class="variable">http</span> <span class="operator">=</span> extensionLoader.getExtension(<span class="string">&quot;dubbo&quot;</span>);</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>dubbo加载目录：META-INF&#x2F;dubbo&#x2F;internal&#x2F;；META-INF&#x2F;dubbo&#x2F;；META-INF&#x2F;services&#x2F;，dubbo的SPI方法中的文件内容为key&#x3D;class</li>
+<li>如果文件中的类有有参构造方法且构造方法的参数有且只有接口类型的参数，就会加载为包装类，SPI获取类时如果有包装类则会获取包装类，获取的实体类则注入包装类</li>
+<li>@Adaptive的含义：SPI加载类时，如果类中需要注入setXXX时，需要从Spring和SPI的容器中获取对应的bean，如果spring中没有，SPI容器中找到有@Adaptive标注的类，如果没有的话， 则需要在响应的方法中加上@Adaptive生成代理方法，代理方法参数中必须有URL参数或者有getUrl方法，URL.put(“类名”，key)</li>
+</ul>
+]]></content>
+      <categories>
+        <category>JAVA</category>
+      </categories>
+      <tags>
+        <tag>Dubbo</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>BIO,NIO&amp;AIO认识以及Netty初识</title>
     <url>/2022/09/20/BIO-NIO-AIO%E8%AE%A4%E8%AF%86/</url>
     <content><![CDATA[<h1 id="BIO-NIO-amp-AIO认识及Netty初识"><a href="#BIO-NIO-amp-AIO认识及Netty初识" class="headerlink" title="BIO,NIO&amp;AIO认识及Netty初识"></a>BIO,NIO&amp;AIO认识及Netty初识</h1><span id="more"></span>
@@ -94,27 +125,161 @@
       </tags>
   </entry>
   <entry>
-    <title>Dubbo中SPI机制</title>
-    <url>/2022/10/09/Dubbo%E4%B8%ADSPI%E6%9C%BA%E5%88%B6/</url>
-    <content><![CDATA[<h1 id="Dubbo中SPI机制"><a href="#Dubbo中SPI机制" class="headerlink" title="Dubbo中SPI机制"></a>Dubbo中SPI机制</h1><span id="more"></span>
-
-<h3 id="JAVA的SPI"><a href="#JAVA的SPI" class="headerlink" title="JAVA的SPI"></a>JAVA的SPI</h3><ul>
-<li>SPI机制：是一种将服务接口与服务实现分离以达到解耦、提升了程序可扩展性的机制；通过本地的注册发现获取到具体的实现类，轻松可插拔</li>
-</ul>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 1.classpath下新建META-INF/services目录中新建接口全路径命名的文件,文件内写入SPI接口的实现类</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123;</span><br><span class="line">    ServiceLoader&lt;SpiInterface&gt; load = ServiceLoader.load(SpiInterface.class);</span><br><span class="line">    Iterator&lt;SpiInterface&gt; iterator = load.iterator();   </span><br><span class="line">    <span class="keyword">while</span> (iterator.hasNext()) &#123;</span><br><span class="line">       <span class="type">SpiInterface</span> <span class="variable">next</span> <span class="operator">=</span> iterator.next();</span><br><span class="line">       next.test(<span class="string">&quot;SPI demo&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+    <title>JAVA程序打war包-idea</title>
+    <url>/2022/09/19/JAVA%E7%A8%8B%E5%BA%8F%E6%89%93war%E5%8C%85-idea/</url>
+    <content><![CDATA[<h1 id="JAVA程序打war包-idea"><a href="#JAVA程序打war包-idea" class="headerlink" title="JAVA程序打war包(idea)"></a>JAVA程序打war包(idea)</h1><span id="more"></span>
 
 <ul>
-<li>SPI使用例子：jdbc的jar包</li>
+<li><h2 id="war包设置"><a href="#war包设置" class="headerlink" title="war包设置"></a>war包设置</h2><blockquote>
+<p>1.File -&gt; Project Structure</p>
+</blockquote>
+</li>
 </ul>
-<h3 id="Dubbo中SPI"><a href="#Dubbo中SPI" class="headerlink" title="Dubbo中SPI"></a>Dubbo中SPI</h3><ul>
-<li>例子:</li>
-</ul>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">ExtensionLoader&lt;Protocol&gt; extensionLoader = ExtensionLoader.getExtensionLoader(Protocol.class);</span><br><span class="line"><span class="type">Protocol</span> <span class="variable">http</span> <span class="operator">=</span> extensionLoader.getExtension(<span class="string">&quot;dubbo&quot;</span>);</span><br></pre></td></tr></table></figure>
-
+<p><img src="/pictures/2-1.png" alt="alt 2-1"></p>
+<p><img src="/pictures/2-2.png" alt="alt 2-2"></p>
 <ul>
-<li>dubbo加载目录：META-INF&#x2F;dubbo&#x2F;internal&#x2F;；META-INF&#x2F;dubbo&#x2F;；META-INF&#x2F;services&#x2F;，dubbo的SPI方法中的文件内容为key&#x3D;class</li>
-<li>如果文件中的类有有参构造方法且构造方法的参数有且只有接口类型的参数，就会加载为包装类，SPI获取类时如果有包装类则会获取包装类，获取的实体类则注入包装类</li>
-<li>@Adaptive的含义：SPI加载类时，如果类中需要注入setXXX时，需要从Spring和SPI的容器中获取对应的bean，如果spring中没有，SPI容器中找到有@Adaptive标注的类，如果没有的话， 则需要在响应的方法中加上@Adaptive生成代理方法，代理方法参数中必须有URL参数或者有getUrl方法，URL.put(“类名”，key)</li>
+<li><h2 id="war包编译设置"><a href="#war包编译设置" class="headerlink" title="war包编译设置"></a>war包编译设置</h2></li>
+</ul>
+<blockquote>
+<p>1.设置工程打包路径</p>
+</blockquote>
+<p><img src="/pictures/2-3.png" alt="alt 2-3"></p>
+<blockquote>
+<p>2.加入class和lib</p>
+</blockquote>
+<p><img src="/pictures/2-4.png" alt="alt 2-4"></p>
+<p><img src="/pictures/2-5.png" alt="alt 2-5"></p>
+<ul>
+<li><h2 id="打包"><a href="#打包" class="headerlink" title="打包"></a>打包</h2></li>
+</ul>
+<blockquote>
+<p>Build -&gt; Build Artifacts -&gt; Build</p>
+</blockquote>
+<p><img src="/pictures/2-6.png" alt="alt 2-6"></p>
+<p><img src="/pictures/2-7.png" alt="alt 2-7"></p>
+<ul>
+<li><h2 id="注意设置java编译路径"><a href="#注意设置java编译路径" class="headerlink" title="注意设置java编译路径"></a>注意设置java编译路径</h2></li>
+</ul>
+<blockquote>
+<p>1.File -&gt; Project Structure -&gt; Project</p>
+</blockquote>
+<p><img src="/pictures/2-8.jpg" alt="alt 2-8"></p>
+]]></content>
+      <categories>
+        <category>idea使用</category>
+      </categories>
+      <tags>
+        <tag>IDEA</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>RPC和Dubbo初识</title>
+    <url>/2022/10/07/RPC%E5%92%8CDubbo%E5%88%9D%E8%AF%86/</url>
+    <content><![CDATA[<h1 id="RPC和Dubbo初识"><a href="#RPC和Dubbo初识" class="headerlink" title="RPC和Dubbo初识"></a>RPC和Dubbo初识</h1><span id="more"></span>
+
+<h3 id="RPC初识"><a href="#RPC初识" class="headerlink" title="RPC初识"></a>RPC初识</h3><p><strong>1.概念</strong></p>
+<ul>
+<li>RPC:远程过程调用，是一个计算机通讯协议。该协议允许一台计算机程序调用另一个地址空间的子程序，即可以像调用本地方法一样调用远程方法。</li>
+</ul>
+<p><strong>2.传输协议</strong></p>
+<ul>
+<li>RPC over Http：基于Http协议来传输数据</li>
+<li>PRC over Tcp：基于Tcp协议来传输数据</li>
+</ul>
+<h3 id="Dubbo初识"><a href="#Dubbo初识" class="headerlink" title="Dubbo初识"></a>Dubbo初识</h3><p><strong>1.概念图</strong></p>
+<p><img src="/pictures/dubbo-01.png" alt="alt dubbo信息"></p>
+<p><strong>2.概念</strong></p>
+<p>Apache Dubbo 是⼀款⾼性能、轻量级的开源 Java 服务框架，涉猎服务治理、服务监控、服务⽹关等等。</p>
+<p><strong>3.本地缓存注册信息</strong></p>
+<ul>
+<li>如果程序运行中注册中心宕机了，服务依旧会调用成功，因为dubbo客户端连接注册中心时会本地缓存一份注册信息，程序调用时会读取缓存中的注册信息</li>
+<li>注册中心中客户端订阅的注册信息发送变化时，注册中心会通知客户端就行更新</li>
+</ul>
+<h3 id="Dubbo功能"><a href="#Dubbo功能" class="headerlink" title="Dubbo功能"></a>Dubbo功能</h3><p><strong>1.负载均衡</strong>(默认：random)</p>
+<ul>
+<li>服务端和客户端都能配置负载均衡策略，如果客户端和服务端都配置了则以客户端配置为准</li>
+<li>负载均衡逻辑在客户端的代码中实现，最少活跃调用数是在客户端统计，调用开始时active+1，调用结束后active-1，active为活跃数</li>
+<li>负载均衡策略：<strong>随机</strong>（可以按权重配置），<strong>轮询</strong>（可以按权重配置），<strong>最少活跃调用数</strong>，<strong>一致性 Hash</strong></li>
+</ul>
+<p><strong>2.服务超时</strong></p>
+<ul>
+<li>服务端和客户端可以配置服务超时时间，如果只有一端配置了超时时间则时程序超时时间</li>
+<li>客户端超时之后会<strong>抛</strong>超时异常，但是服务端超时之后<strong>只</strong>打印⼀个超时⽇志</li>
+<li>异步调用也是有超时的，但是<strong>容错和mock</strong>（像同步那样设置时）不生效。</li>
+</ul>
+<p><strong>3.集群容错</strong>(默认：失败自动重试，<code>retries=&quot;2&quot;</code> 来设置重试次数(不含第一次))</p>
+<ul>
+<li><p>客户端调用失败(一般指RpcException(如:超时),程序运行中业务throw Exception不会重试)之后，执行配置的容错策略，比如：重新调用其他的服务</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">//服务端会把业务抛出的异常(超时会包装为RpcException)放到appResponse的Throwable exception属性中，并把异常包装为RuntimeException,异步调用没有容错机制</span></span><br><span class="line"><span class="comment">//mock机制判断异常时，代码：result.getException() instanceof RpcException</span></span><br><span class="line">result = <span class="built_in">this</span>.invoker.invoke(invocation);</span><br><span class="line"><span class="keyword">if</span>(result.getException() != <span class="literal">null</span> &amp;&amp; result.getException() <span class="keyword">instanceof</span> RpcException)&#123; mock返回&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">FailoverClusterInvoker</span>&lt;T&gt; <span class="keyword">extends</span> <span class="title class_">AbstractClusterInvoker</span>&lt;T&gt; &#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> Result <span class="title function_">doInvoke</span><span class="params">(Invocation invocation, <span class="keyword">final</span> List&lt;Invoker&lt;T&gt;&gt; invokers, LoadBalance loadbalance)</span> <span class="keyword">throws</span> 				RpcException &#123;</span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">0</span>; i &lt; len; i++) &#123;</span><br><span class="line">            <span class="keyword">try</span>&#123;</span><br><span class="line">                <span class="type">Result</span> <span class="variable">result</span> <span class="operator">=</span> invoker.invoke(invocation);</span><br><span class="line">			<span class="comment">//框架抛出的异常，服务端业务抛出的异常会进行封装</span></span><br><span class="line">            &#125; <span class="keyword">catch</span> (RpcException e) &#123;</span><br><span class="line">                <span class="keyword">if</span> (e.isBiz()) &#123; <span class="comment">// 业务异常</span></span><br><span class="line">                    <span class="keyword">throw</span> e;</span><br><span class="line">                &#125;</span><br><span class="line">                le = e;<span class="comment">//继续for循环</span></span><br><span class="line">            &#125; <span class="keyword">catch</span> (Throwable e) &#123;</span><br><span class="line">                le = <span class="keyword">new</span> <span class="title class_">RpcException</span>(e.getMessage(), e);<span class="comment">//继续for循环</span></span><br><span class="line">            &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">                providers.add(invoker.getUrl().getAddress());</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><img src="/pictures/dubbo-02.png" alt="alt dubbo-Exception"></p>
+</li>
+<li><p>集群容错模式：</p>
+<blockquote>
+<ul>
+<li>Failfast Cluster(快速失败，只发起一次调用，失败立即报错)</li>
+<li>Failsafe Cluster(失败安全，出现异常时，直接忽略)</li>
+<li>Failback Cluster(失败自动恢复，后台记录失败请求，定时重发)</li>
+<li>Forking Cluster(并行调用多个服务器，只要一个成功即返回)</li>
+<li>Broadcast Cluster(广播调用所有提供者，逐个调用，任意一台报错则报错)</li>
+</ul>
+</blockquote>
+</li>
+</ul>
+<p><strong>4.服务降级</strong></p>
+<ul>
+<li><p>服务提供者报错了，所采取的措施，如报错后返回fail等信息</p>
+</li>
+<li><p>集群容错和服务降级的区别</p>
+<blockquote>
+<p>集群容错是整个集群范围内的容错</p>
+<p>服务降级是单个服务提供者的⾃身容错</p>
+</blockquote>
+</li>
+</ul>
+<p><strong>5.本地存根</strong></p>
+<ul>
+<li>本地存根就是⼀段逻辑，这段逻辑是在服务消费端执⾏的,</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">//客户端需要提供存根（Stub）</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">BarServiceStub</span> <span class="keyword">implements</span> <span class="title class_">BarService</span> &#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> BarService barService;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 构造函数传入真正的远程代理对象</span></span><br><span class="line">    <span class="keyword">public</span> <span class="title function_">BarServiceStub</span><span class="params">(BarService barService)</span>&#123;</span><br><span class="line">        <span class="built_in">this</span>.barService = barService;</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    <span class="keyword">public</span> String <span class="title function_">sayHello</span><span class="params">(String name)</span> &#123;</span><br><span class="line">        <span class="comment">// 此代码在客户端执行, 你可以在客户端做ThreadLocal本地缓存，或预先验证参数是否合法，等等</span></span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            <span class="keyword">return</span> barService.sayHello(name);</span><br><span class="line">        &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">            <span class="comment">// 你可以容错，可以做任何AOP拦截事项</span></span><br><span class="line">            <span class="keyword">return</span> <span class="string">&quot;容错数据&quot;</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>6.本地伪装</strong></p>
+<ul>
+<li>本地伪装就是Mock</li>
+</ul>
+<p><strong>7.参数回调</strong></p>
+<ul>
+<li>客户端调用服务端后，服务端的逻辑需要调用客户端。例：<a href="http://dubbo.apache.org/zh/docs/v2.7/user/examples/callback-parameter/">http://dubbo.apache.org/zh/docs/v2.7/user/examples/callback-parameter/</a></li>
+</ul>
+<p><strong>8.异步调用</strong></p>
+<p><strong>9.泛化调用和泛化调用服务</strong></p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Reference(id = &quot;xxxxService&quot;, version = &quot;default&quot;, interfaceName = &quot;com.xxx.XxxService&quot;, generic = true)</span></span><br><span class="line"><span class="keyword">private</span> GenericService genericService;</span><br><span class="line"></span><br><span class="line"><span class="meta">@Service(interfaceName = &quot;com.tuling.XxxService&quot;, version = &quot;generic&quot;)</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">GenericDemoService</span> <span class="keyword">implements</span> <span class="title class_">GenericService</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>10.Dubbo中的REST</strong></p>
+<h3 id="控制台"><a href="#控制台" class="headerlink" title="控制台"></a>控制台</h3><ul>
+<li>控制台可以动态配置或修改服务参数，配置路由规则，和tag配置(客户端中发送的tag来转发到特定的服务端，即实现蓝绿发布，灰度发布)</li>
+</ul>
+<h3 id="dubbo常识"><a href="#dubbo常识" class="headerlink" title="dubbo常识"></a>dubbo常识</h3><ul>
+<li><p>dubbo自带的配置中心的配置大于代码中的配置(<strong>默认是大于的，可以配置为配置中心优先级小于代码中的配置</strong>)，代码中的配置（类中的配置&gt;application中的配置）</p>
+</li>
+<li><p><strong>port+path&#x2F;name+version+group</strong>作为服务的key进行查找服务并执行服务的</p>
+</li>
+<li><p><strong>@Activate</strong>注解</p>
+<blockquote>
+<p>这个注解的属性有：</p>
+<ul>
+<li>String[] group()：表示这个扩展点是属于哪组的，这⾥组通常分为PROVIDER和CONSUMER，表示 该扩展点能在服务提供者端，或者消费端使⽤</li>
+<li>String[] value()：表示的是URL中的某个参数key，当利⽤getActivateExtension⽅法来寻找扩展点 时，如果传⼊的url中包含的参数的所有key中，包括了当前扩展点中的value值，那么则表示当前url可 以使⽤该扩展点。</li>
+</ul>
+<p>使用</p>
+<ul>
+<li>类中或方法中使用@Activate</li>
+<li>SPI文件中增加@Activate的类的全路径类名</li>
+</ul>
+</blockquote>
+</li>
+<li><p>dubbo调用时直接负载均衡获取Invoker类，然后进行调用，不会在查询注册信息，如果注册中心的注册信息发生改变时，Invoker就会改变。</p>
+</li>
 </ul>
 ]]></content>
       <categories>
@@ -122,6 +287,100 @@
       </categories>
       <tags>
         <tag>Dubbo</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>自动注入@Autowired和@Resource</title>
+    <url>/2022/09/19/%E8%87%AA%E5%8A%A8%E6%B3%A8%E5%85%A5-Autowired%E5%92%8C-Resource/</url>
+    <content><![CDATA[<h1 id="自动注入-Autowired和-Resource"><a href="#自动注入-Autowired和-Resource" class="headerlink" title="自动注入@Autowired和@Resource"></a>自动注入@Autowired和@Resource</h1><span id="more"></span>
+
+<h4 id="1-来源不同"><a href="#1-来源不同" class="headerlink" title="1.来源不同"></a>1.来源不同</h4><blockquote>
+<ul>
+<li>@Autowired来自Spring，全路径类名为：org.springframework.beans.factory.annotation.Autowired</li>
+<li>@Resource 来自JDK，全路径类名为：javax.annotation.Resource</li>
+</ul>
+</blockquote>
+<h4 id="2-注入方式不同"><a href="#2-注入方式不同" class="headerlink" title="2.注入方式不同"></a>2.注入方式不同</h4><blockquote>
+<p><del>大家的常识似乎为@Autowired是根据类型注入的，如果两个类实现同一个接口就不能用@Autowired</del>，<strong>但这个常识是错误的</strong></p>
+<p>@Autowired的注入方式为：</p>
+<ul>
+<li>如果查询结果刚好为一个，就将该bean装配给@Autowired指定的数据</li>
+<li>如果查询的结果不止一个，先根据 @Primary 来决策，其次是 @Priority 决策优先级</li>
+<li>最后是根据 Bean 名字的严格匹配来决策</li>
+</ul>
+<p><img src="/pictures/autowire.png" alt="alt 修改config"></p>
+<p>@Resource的注入方式为：</p>
+<ul>
+<li>如果没有指定name和type属性的话，默认首先使用属性名称作为bean name进行注入，如果查询不到，则使用属性的类型进行查找注入</li>
+<li>如果指定了name和type其中一个，就按照指定的来进行注入，找不到或者找到多个，都会抛出异常</li>
+<li>如果同时指定了name和type，则从Spring上下文中找到唯一匹配（类型和名称同时匹配）的bean进行装配，找不到则抛出异常</li>
+</ul>
+</blockquote>
+<h4 id="其他方面"><a href="#其他方面" class="headerlink" title="其他方面"></a>其他方面</h4><blockquote>
+<ul>
+<li><p>如果@Autowired想指定名称注入的话，一般用@Autowired+@Qualifie(“beanName”)的方式</p>
+</li>
+<li><p>@Autowired与@Resource都可以用来装配bean. 都可以写在字段上,或写在setter方法上。</p>
+</li>
+<li><p>@Autowired默认情况下必须要求依赖对象必须存在，如果要允许null值，可以设置它的required属性为false（@Autowired(required&#x3D;false)</p>
+</li>
+</ul>
+</blockquote>
+]]></content>
+      <categories>
+        <category>spring初识</category>
+      </categories>
+      <tags>
+        <tag>Spring</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>hexo-next新增文章</title>
+    <url>/2022/09/19/hexo-next%E6%96%B0%E5%A2%9E%E6%96%87%E7%AB%A0/</url>
+    <content><![CDATA[<h1 id="hexo-next新增文章"><a href="#hexo-next新增文章" class="headerlink" title="hexo-next新增文章"></a>hexo-next新增文章</h1><span id="more"></span>
+
+<h2 id="安装hexo"><a href="#安装hexo" class="headerlink" title="安装hexo"></a>安装hexo</h2><blockquote>
+<p>1.安装node.js和git</p>
+<p>2.安装hexo</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">#安装hexo</span><br><span class="line">npm install -g hexo</span><br><span class="line">#新建自己的项目文件夹(myproject)并进入自己的项目文件夹</span><br><span class="line">cd myproject</span><br><span class="line">hexo init</span><br><span class="line">#安装依赖</span><br><span class="line">npm install</span><br><span class="line">#hexo编译和启动</span><br><span class="line">hexo g</span><br><span class="line">hexo s</span><br><span class="line">#访问http://localhost:4000,查看hexo是否搭建成功</span><br></pre></td></tr></table></figure>
+
+<p>3.安装git插件</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">npm install hexo-deployer-git --save</span><br></pre></td></tr></table></figure>
+</blockquote>
+<h1 id="安装hexo-next"><a href="#安装hexo-next" class="headerlink" title="安装hexo-next"></a>安装hexo-next</h1><blockquote>
+<p>1.安装hexo-next插件</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">&gt;#先myproject目录下执行</span><br><span class="line">&gt;git clone https://github.com/theme-next/hexo-theme-next.git</span><br><span class="line">&gt;#修改myproject目录下的_conf.yml</span><br><span class="line">&gt;theme: next</span><br></pre></td></tr></table></figure>
+</blockquote>
+<p><img src="/pictures/update_hexo_config.png" alt="alt 修改config"></p>
+<h1 id="参数配置"><a href="#参数配置" class="headerlink" title="参数配置"></a>参数配置</h1><p>1.myproject&#x2F;_config.yml</p>
+<blockquote>
+<figure class="highlight yaml"><table><tr><td class="code"><pre><span class="line"><span class="comment">## 中文</span></span><br><span class="line"><span class="attr">language:</span> <span class="string">zh-CN</span></span><br><span class="line"><span class="comment">## 时间统计</span></span><br><span class="line"><span class="attr">symbols_count_time:</span></span><br><span class="line">  <span class="comment"># 文章字数统计</span></span><br><span class="line">  <span class="attr">symbols:</span> <span class="literal">true</span></span><br><span class="line">  <span class="comment"># 文章阅读时间统计</span></span><br><span class="line">  <span class="attr">time:</span> <span class="literal">true</span></span><br><span class="line">  <span class="comment"># 网站总字数统计</span></span><br><span class="line">  <span class="attr">total_symbols:</span> <span class="literal">true</span></span><br><span class="line">  <span class="comment"># 网站总阅读时间统计</span></span><br><span class="line">  <span class="attr">total_time:</span> <span class="literal">true</span></span><br><span class="line">  <span class="attr">exclude_codeblock:</span> <span class="literal">false</span></span><br><span class="line"><span class="comment">#搜索 防止部署之后一致加载搜索</span></span><br><span class="line"><span class="attr">search:</span></span><br><span class="line">  <span class="attr">path:</span> <span class="string">search.xml</span></span><br><span class="line">  <span class="attr">field:</span> <span class="string">post</span></span><br><span class="line">  <span class="attr">format:</span> <span class="string">html</span></span><br><span class="line">  <span class="attr">limit:</span> <span class="number">10000</span></span><br></pre></td></tr></table></figure>
+
+<p>2.myproject&#x2F;themes&#x2F;next&#x2F;_config.yml</p>
+<figure class="highlight yaml"><table><tr><td class="code"><pre><span class="line"><span class="comment">## 时间统计</span></span><br><span class="line"><span class="attr">symbols_count_time:</span></span><br><span class="line">  <span class="comment">## 是否另起一行</span></span><br><span class="line">  <span class="attr">separated_meta:</span> <span class="literal">true</span></span><br><span class="line">  <span class="comment">## 首页统计数量前是否显示文字</span></span><br><span class="line">  <span class="attr">item_text_post:</span> <span class="literal">true</span></span><br><span class="line">  <span class="comment">## 底部统计数量前是否显示文字</span></span><br><span class="line">  <span class="attr">item_text_total:</span> <span class="literal">false</span></span><br><span class="line">  <span class="comment">## 平均字长</span></span><br><span class="line">  <span class="attr">awl:</span> <span class="number">4</span></span><br><span class="line">  <span class="comment">## 每分钟阅读字数</span></span><br><span class="line">  <span class="attr">wpm:</span> <span class="number">300</span></span><br><span class="line">  <span class="comment"># 站点预览</span></span><br><span class="line"><span class="attr">avatar:</span></span><br><span class="line">  <span class="comment"># Replace the default image and set the url here.目录为source为根目录</span></span><br><span class="line">  <span class="attr">url:</span> <span class="string">/images/avatar.gif</span></span><br><span class="line">  <span class="comment"># If true, the avatar will be dispalyed in circle.</span></span><br><span class="line">  <span class="attr">rounded:</span> <span class="literal">true</span></span><br><span class="line">  <span class="comment"># If true, the avatar will be rotated with the cursor.</span></span><br><span class="line">  <span class="attr">rotated:</span> <span class="literal">false</span></span><br></pre></td></tr></table></figure>
+
+
+</blockquote>
+<h1 id="新建文章"><a href="#新建文章" class="headerlink" title="新建文章"></a>新建文章</h1><blockquote>
+<p>1.新建文章(文章名称:doc)</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">hexo new doc</span><br></pre></td></tr></table></figure>
+
+<p>2.使用markdown编辑器修改文章</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">#文章目录</span><br><span class="line">/myproject/_posts/doc</span><br></pre></td></tr></table></figure>
+</blockquote>
+<h1 id="发布文章"><a href="#发布文章" class="headerlink" title="发布文章"></a>发布文章</h1><blockquote>
+<p>1.修改myproject目录下的_conf.yml配置文件</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">#修改deploy属性</span><br></pre></td></tr></table></figure>
+
+<p><img src="/pictures/update_display_config.jpg" alt="alt 修改config"></p>
+<p>2.发布命令</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">hexo d</span><br></pre></td></tr></table></figure></blockquote>
+]]></content>
+      <categories>
+        <category>hexo</category>
+      </categories>
+      <tags>
+        <tag>hexo</tag>
       </tags>
   </entry>
   <entry>
@@ -298,13 +557,13 @@
 <li>query_string和match类似，但是match需要指定字段名，query_string可以不指定字段，不指定时是在所有字段中搜索，范围更广泛。</li>
 </ul>
 </blockquote>
-<figure class="highlight json"><table><tr><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">    <span class="attr">&quot;query&quot;</span><span class="punctuation">:</span><span class="punctuation">&#123;</span></span><br><span class="line">        <span class="attr">&quot;term&quot;</span><span class="punctuation">:</span><span class="punctuation">&#123;</span> # term查询时不分词，match查询时分词</span><br><span class="line">            <span class="attr">&quot;name&quot;</span><span class="punctuation">:</span><span class="string">&quot;111&quot;</span></span><br><span class="line">        <span class="punctuation">&#125;</span></span><br><span class="line">    <span class="punctuation">&#125;</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">    <span class="attr">&quot;query&quot;</span><span class="punctuation">:</span><span class="punctuation">&#123;</span></span><br><span class="line">        <span class="attr">&quot;match&quot;</span><span class="punctuation">:</span><span class="punctuation">&#123;</span> </span><br><span class="line">            <span class="attr">&quot;name&quot;</span><span class="punctuation">:</span><span class="punctuation">&#123;</span></span><br><span class="line">               <span class="attr">&quot;query&quot;</span><span class="punctuation">:</span><span class="string">&quot;wo men&quot;</span><span class="punctuation">,</span></span><br><span class="line">                <span class="attr">&quot;operator&quot;</span><span class="punctuation">:</span><span class="string">&quot;and&quot;</span> # 分词之后的词都包含  or：分词之后的词最少包含一个</span><br><span class="line">            <span class="punctuation">&#125;</span></span><br><span class="line">        <span class="punctuation">&#125;</span></span><br><span class="line">    <span class="punctuation">&#125;</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br><span class="line"># <span class="string">&quot;address&quot;</span><span class="punctuation">,</span><span class="string">&quot;name&quot;</span>中分词查询张三</span><br><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">    <span class="attr">&quot;query&quot;</span><span class="punctuation">:</span><span class="punctuation">&#123;</span></span><br><span class="line">        <span class="attr">&quot;multi_match&quot;</span><span class="punctuation">:</span><span class="punctuation">&#123;</span> </span><br><span class="line">            <span class="attr">&quot;query&quot;</span><span class="punctuation">:</span><span class="string">&quot;张三&quot;</span><span class="punctuation">,</span></span><br><span class="line">            <span class="attr">&quot;fields&quot;</span><span class="punctuation">:</span><span class="punctuation">[</span><span class="string">&quot;address&quot;</span><span class="punctuation">,</span><span class="string">&quot;name&quot;</span><span class="punctuation">]</span></span><br><span class="line">        <span class="punctuation">&#125;</span></span><br><span class="line">    <span class="punctuation">&#125;</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br><span class="line"># 范围查询</span><br><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">    <span class="attr">&quot;query&quot;</span><span class="punctuation">:</span><span class="punctuation">&#123;</span></span><br><span class="line">        <span class="attr">&quot;range&quot;</span><span class="punctuation">:</span><span class="punctuation">&#123;</span> </span><br><span class="line">            <span class="attr">&quot;age&quot;</span><span class="punctuation">:</span><span class="punctuation">&#123;</span></span><br><span class="line">                <span class="attr">&quot;gte&quot;</span><span class="punctuation">:</span><span class="number">25</span> ## gte<span class="punctuation">:</span>大于等于 lte<span class="punctuation">:</span>小于等于 gt<span class="punctuation">:</span>大于 lt<span class="punctuation">:</span>小于</span><br><span class="line">            <span class="punctuation">&#125;</span></span><br><span class="line">        <span class="punctuation">&#125;</span></span><br><span class="line">    <span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;from&quot;</span><span class="punctuation">:</span> <span class="number">0</span><span class="punctuation">,</span> #分页</span><br><span class="line">	<span class="attr">&quot;size&quot;</span><span class="punctuation">:</span> <span class="number">2</span><span class="punctuation">,</span> #分页</span><br><span class="line">	<span class="attr">&quot;_source&quot;</span><span class="punctuation">:</span> <span class="punctuation">[</span><span class="string">&quot;name&quot;</span><span class="punctuation">,</span> <span class="string">&quot;age&quot;</span><span class="punctuation">,</span> <span class="string">&quot;book&quot;</span><span class="punctuation">]</span><span class="punctuation">,</span> #返回字段</span><br><span class="line">    <span class="attr">&quot;sort&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span><span class="attr">&quot;age&quot;</span><span class="punctuation">:</span><span class="string">&quot;desc&quot;</span><span class="punctuation">&#125;</span> # 排序</span><br><span class="line"></span><br><span class="line"><span class="punctuation">&#125;</span></span><br><span class="line"># 模糊搜索</span><br><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">    <span class="attr">&quot;query&quot;</span><span class="punctuation">:</span><span class="punctuation">&#123;</span></span><br><span class="line">        <span class="attr">&quot;fuzzy&quot;</span><span class="punctuation">:</span><span class="punctuation">&#123;</span> # 模糊搜索</span><br><span class="line">            <span class="attr">&quot;name&quot;</span><span class="punctuation">:</span><span class="punctuation">&#123;</span></span><br><span class="line">                <span class="attr">&quot;value&quot;</span> <span class="punctuation">:</span> <span class="string">&quot;word&quot;</span><span class="punctuation">,</span></span><br><span class="line">				<span class="attr">&quot;fuzziness&quot;</span><span class="punctuation">:</span> <span class="number">2</span> # 相差几个词</span><br><span class="line">            <span class="punctuation">&#125;</span></span><br><span class="line">        <span class="punctuation">&#125;</span></span><br><span class="line">    <span class="punctuation">&#125;</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight json"><table><tr><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">    <span class="attr">&quot;query&quot;</span><span class="punctuation">:</span><span class="punctuation">&#123;</span></span><br><span class="line">        <span class="attr">&quot;term&quot;</span><span class="punctuation">:</span><span class="punctuation">&#123;</span> <span class="comment">// term查询时不分词，match查询时分词</span></span><br><span class="line">            <span class="attr">&quot;name&quot;</span><span class="punctuation">:</span><span class="string">&quot;111&quot;</span></span><br><span class="line">        <span class="punctuation">&#125;</span></span><br><span class="line">    <span class="punctuation">&#125;</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">    <span class="attr">&quot;query&quot;</span><span class="punctuation">:</span><span class="punctuation">&#123;</span></span><br><span class="line">        <span class="attr">&quot;match&quot;</span><span class="punctuation">:</span><span class="punctuation">&#123;</span> </span><br><span class="line">            <span class="attr">&quot;name&quot;</span><span class="punctuation">:</span><span class="punctuation">&#123;</span></span><br><span class="line">               <span class="attr">&quot;query&quot;</span><span class="punctuation">:</span><span class="string">&quot;wo men&quot;</span><span class="punctuation">,</span></span><br><span class="line">                <span class="attr">&quot;operator&quot;</span><span class="punctuation">:</span><span class="string">&quot;and&quot;</span> <span class="comment">// 分词之后的词都包含  or：分词之后的词最少包含一个</span></span><br><span class="line">            <span class="punctuation">&#125;</span></span><br><span class="line">        <span class="punctuation">&#125;</span></span><br><span class="line">    <span class="punctuation">&#125;</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br><span class="line"><span class="comment">// &quot;address&quot;,&quot;name&quot;中分词查询张三</span></span><br><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">    <span class="attr">&quot;query&quot;</span><span class="punctuation">:</span><span class="punctuation">&#123;</span></span><br><span class="line">        <span class="attr">&quot;multi_match&quot;</span><span class="punctuation">:</span><span class="punctuation">&#123;</span> </span><br><span class="line">            <span class="attr">&quot;query&quot;</span><span class="punctuation">:</span><span class="string">&quot;张三&quot;</span><span class="punctuation">,</span></span><br><span class="line">            <span class="attr">&quot;fields&quot;</span><span class="punctuation">:</span><span class="punctuation">[</span><span class="string">&quot;address&quot;</span><span class="punctuation">,</span><span class="string">&quot;name&quot;</span><span class="punctuation">]</span></span><br><span class="line">        <span class="punctuation">&#125;</span></span><br><span class="line">    <span class="punctuation">&#125;</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br><span class="line"><span class="comment">// 范围查询</span></span><br><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">    <span class="attr">&quot;query&quot;</span><span class="punctuation">:</span><span class="punctuation">&#123;</span></span><br><span class="line">        <span class="attr">&quot;range&quot;</span><span class="punctuation">:</span><span class="punctuation">&#123;</span> </span><br><span class="line">            <span class="attr">&quot;age&quot;</span><span class="punctuation">:</span><span class="punctuation">&#123;</span></span><br><span class="line">                <span class="attr">&quot;gte&quot;</span><span class="punctuation">:</span><span class="number">25</span> <span class="comment">// gte:大于等于 lte:小于等于 gt:大于 lt:小于</span></span><br><span class="line">            <span class="punctuation">&#125;</span></span><br><span class="line">        <span class="punctuation">&#125;</span></span><br><span class="line">    <span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;from&quot;</span><span class="punctuation">:</span> <span class="number">0</span><span class="punctuation">,</span> <span class="comment">//分页</span></span><br><span class="line">	<span class="attr">&quot;size&quot;</span><span class="punctuation">:</span> <span class="number">2</span><span class="punctuation">,</span> <span class="comment">//分页</span></span><br><span class="line">	<span class="attr">&quot;_source&quot;</span><span class="punctuation">:</span> <span class="punctuation">[</span><span class="string">&quot;name&quot;</span><span class="punctuation">,</span> <span class="string">&quot;age&quot;</span><span class="punctuation">,</span> <span class="string">&quot;book&quot;</span><span class="punctuation">]</span><span class="punctuation">,</span> <span class="comment">//返回字段</span></span><br><span class="line">    <span class="attr">&quot;sort&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span><span class="attr">&quot;age&quot;</span><span class="punctuation">:</span><span class="string">&quot;desc&quot;</span><span class="punctuation">&#125;</span> <span class="comment">// 排序</span></span><br><span class="line"></span><br><span class="line"><span class="punctuation">&#125;</span></span><br><span class="line"><span class="comment">// 模糊搜索</span></span><br><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">    <span class="attr">&quot;query&quot;</span><span class="punctuation">:</span><span class="punctuation">&#123;</span></span><br><span class="line">        <span class="attr">&quot;fuzzy&quot;</span><span class="punctuation">:</span><span class="punctuation">&#123;</span> <span class="comment">// 模糊搜索</span></span><br><span class="line">            <span class="attr">&quot;name&quot;</span><span class="punctuation">:</span><span class="punctuation">&#123;</span></span><br><span class="line">                <span class="attr">&quot;value&quot;</span> <span class="punctuation">:</span> <span class="string">&quot;word&quot;</span><span class="punctuation">,</span></span><br><span class="line">				<span class="attr">&quot;fuzziness&quot;</span><span class="punctuation">:</span> <span class="number">2</span> <span class="comment">// 相差几个词</span></span><br><span class="line">            <span class="punctuation">&#125;</span></span><br><span class="line">        <span class="punctuation">&#125;</span></span><br><span class="line">    <span class="punctuation">&#125;</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
 </li>
 <li><p>Filter过滤器方式查询，它的查询不会计算相关性分值，也不会对结果进 行排序, 因此效率会高一点，查询的结果可以被缓存。</p>
-<figure class="highlight json"><table><tr><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">    <span class="attr">&quot;query&quot;</span><span class="punctuation">:</span><span class="punctuation">&#123;</span></span><br><span class="line">        <span class="attr">&quot;filter&quot;</span><span class="punctuation">:</span><span class="punctuation">&#123;</span> </span><br><span class="line">            <span class="attr">&quot;term&quot;</span><span class="punctuation">:</span><span class="punctuation">&#123;</span> # term查询时不分词，match查询时分词</span><br><span class="line">                <span class="attr">&quot;name&quot;</span><span class="punctuation">:</span><span class="string">&quot;111&quot;</span></span><br><span class="line">            <span class="punctuation">&#125;</span></span><br><span class="line">        <span class="punctuation">&#125;</span></span><br><span class="line">    <span class="punctuation">&#125;</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight json"><table><tr><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">    <span class="attr">&quot;query&quot;</span><span class="punctuation">:</span><span class="punctuation">&#123;</span></span><br><span class="line">        <span class="attr">&quot;filter&quot;</span><span class="punctuation">:</span><span class="punctuation">&#123;</span> </span><br><span class="line">            <span class="attr">&quot;term&quot;</span><span class="punctuation">:</span><span class="punctuation">&#123;</span> <span class="comment">// term查询时不分词，match查询时分词</span></span><br><span class="line">                <span class="attr">&quot;name&quot;</span><span class="punctuation">:</span><span class="string">&quot;111&quot;</span></span><br><span class="line">            <span class="punctuation">&#125;</span></span><br><span class="line">        <span class="punctuation">&#125;</span></span><br><span class="line">    <span class="punctuation">&#125;</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
 </li>
 <li><p>聚合操作</p>
-<figure class="highlight json"><table><tr><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">   <span class="attr">&quot;query&quot;</span><span class="punctuation">:</span><span class="punctuation">&#123;</span></span><br><span class="line">        <span class="attr">&quot;term&quot;</span><span class="punctuation">:</span><span class="punctuation">&#123;</span> # term查询时不分词，match查询时分词</span><br><span class="line">            <span class="attr">&quot;name&quot;</span><span class="punctuation">:</span><span class="string">&quot;111&quot;</span></span><br><span class="line">        <span class="punctuation">&#125;</span></span><br><span class="line">    <span class="punctuation">&#125;</span></span><br><span class="line">    <span class="attr">&quot;aggs&quot;</span><span class="punctuation">:</span><span class="punctuation">&#123;</span></span><br><span class="line">        <span class="attr">&quot;定义分组名称（最外层）&quot;</span><span class="punctuation">:</span><span class="punctuation">&#123;</span></span><br><span class="line">            <span class="attr">&quot;分组策略如：terms、avg、sum、max、min、&quot;</span><span class="punctuation">:</span><span class="punctuation">&#123;</span></span><br><span class="line">                <span class="attr">&quot;field&quot;</span><span class="punctuation">:</span><span class="string">&quot;根据哪一个字段分组&quot;</span><span class="punctuation">,</span></span><br><span class="line">                <span class="attr">&quot;其他参数&quot;</span><span class="punctuation">:</span><span class="string">&quot;&quot;</span><span class="punctuation">,</span></span><br><span class="line">    			# 排序</span><br><span class="line">    			<span class="attr">&quot;order&quot;</span><span class="punctuation">:</span><span class="punctuation">&#123;</span></span><br><span class="line">    				<span class="attr">&quot;分组名称1&quot;</span><span class="punctuation">:</span><span class="string">&quot;desc&quot;</span></span><br><span class="line">				<span class="punctuation">&#125;</span></span><br><span class="line">            <span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">            <span class="attr">&quot;aggs&quot;</span><span class="punctuation">:</span><span class="punctuation">&#123;</span></span><br><span class="line">                <span class="attr">&quot;分组名称1&quot;</span><span class="punctuation">:</span><span class="punctuation">&#123;</span><span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">                <span class="attr">&quot;分组名称2&quot;</span><span class="punctuation">:</span><span class="punctuation">&#123;</span><span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">        	<span class="punctuation">&#125;</span></span><br><span class="line">        <span class="punctuation">&#125;</span></span><br><span class="line">    <span class="punctuation">&#125;</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br><span class="line"># histogram 区间统计</span><br><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">    <span class="attr">&quot;aggs&quot;</span><span class="punctuation">:</span><span class="punctuation">&#123;</span></span><br><span class="line">        <span class="attr">&quot;定义分组名称（最外层）&quot;</span><span class="punctuation">:</span><span class="punctuation">&#123;</span></span><br><span class="line">            <span class="attr">&quot;histogram&quot;</span><span class="punctuation">:</span><span class="punctuation">&#123;</span></span><br><span class="line">                <span class="attr">&quot;field&quot;</span><span class="punctuation">:</span> <span class="string">&quot;price&quot;</span><span class="punctuation">,</span></span><br><span class="line">                <span class="attr">&quot;interval&quot;</span><span class="punctuation">:</span> <span class="number">1000000</span> # 步幅</span><br><span class="line">            <span class="punctuation">&#125;</span></span><br><span class="line">        <span class="punctuation">&#125;</span></span><br><span class="line">    <span class="punctuation">&#125;</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br><span class="line"># date_histogram</span><br><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">    <span class="attr">&quot;aggs&quot;</span><span class="punctuation">:</span><span class="punctuation">&#123;</span></span><br><span class="line">        <span class="attr">&quot;定义分组名称（最外层）&quot;</span><span class="punctuation">:</span><span class="punctuation">&#123;</span></span><br><span class="line">            <span class="attr">&quot;histogram&quot;</span><span class="punctuation">:</span><span class="punctuation">&#123;</span></span><br><span class="line">                <span class="attr">&quot;field&quot;</span><span class="punctuation">:</span> <span class="string">&quot;price&quot;</span><span class="punctuation">,</span></span><br><span class="line">                <span class="attr">&quot;interval&quot;</span><span class="punctuation">:</span> year # year、quarter、month、week、day、hour、minute、second</span><br><span class="line">            <span class="punctuation">&#125;</span></span><br><span class="line">        <span class="punctuation">&#125;</span></span><br><span class="line">    <span class="punctuation">&#125;</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br><span class="line"># 排序</span><br><span class="line"></span><br></pre></td></tr></table></figure></li>
+<figure class="highlight json"><table><tr><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">   <span class="attr">&quot;query&quot;</span><span class="punctuation">:</span><span class="punctuation">&#123;</span></span><br><span class="line">        <span class="attr">&quot;term&quot;</span><span class="punctuation">:</span><span class="punctuation">&#123;</span> <span class="comment">// term查询时不分词，match查询时分词</span></span><br><span class="line">            <span class="attr">&quot;name&quot;</span><span class="punctuation">:</span><span class="string">&quot;111&quot;</span></span><br><span class="line">        <span class="punctuation">&#125;</span></span><br><span class="line">    <span class="punctuation">&#125;</span></span><br><span class="line">    <span class="attr">&quot;aggs&quot;</span><span class="punctuation">:</span><span class="punctuation">&#123;</span></span><br><span class="line">        <span class="attr">&quot;定义分组名称（最外层）&quot;</span><span class="punctuation">:</span><span class="punctuation">&#123;</span></span><br><span class="line">            <span class="attr">&quot;分组策略如：terms、avg、sum、max、min、&quot;</span><span class="punctuation">:</span><span class="punctuation">&#123;</span></span><br><span class="line">                <span class="attr">&quot;field&quot;</span><span class="punctuation">:</span><span class="string">&quot;根据哪一个字段分组&quot;</span><span class="punctuation">,</span></span><br><span class="line">                <span class="attr">&quot;其他参数&quot;</span><span class="punctuation">:</span><span class="string">&quot;&quot;</span><span class="punctuation">,</span></span><br><span class="line">    			<span class="comment">// 排序</span></span><br><span class="line">    			<span class="attr">&quot;order&quot;</span><span class="punctuation">:</span><span class="punctuation">&#123;</span></span><br><span class="line">    				<span class="attr">&quot;分组名称1&quot;</span><span class="punctuation">:</span><span class="string">&quot;desc&quot;</span></span><br><span class="line">				<span class="punctuation">&#125;</span></span><br><span class="line">            <span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">            <span class="attr">&quot;aggs&quot;</span><span class="punctuation">:</span><span class="punctuation">&#123;</span></span><br><span class="line">                <span class="attr">&quot;分组名称1&quot;</span><span class="punctuation">:</span><span class="punctuation">&#123;</span><span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">                <span class="attr">&quot;分组名称2&quot;</span><span class="punctuation">:</span><span class="punctuation">&#123;</span><span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">        	<span class="punctuation">&#125;</span></span><br><span class="line">        <span class="punctuation">&#125;</span></span><br><span class="line">    <span class="punctuation">&#125;</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br><span class="line"><span class="comment">// histogram 区间统计</span></span><br><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">    <span class="attr">&quot;aggs&quot;</span><span class="punctuation">:</span><span class="punctuation">&#123;</span></span><br><span class="line">        <span class="attr">&quot;定义分组名称（最外层）&quot;</span><span class="punctuation">:</span><span class="punctuation">&#123;</span></span><br><span class="line">            <span class="attr">&quot;histogram&quot;</span><span class="punctuation">:</span><span class="punctuation">&#123;</span></span><br><span class="line">                <span class="attr">&quot;field&quot;</span><span class="punctuation">:</span> <span class="string">&quot;price&quot;</span><span class="punctuation">,</span></span><br><span class="line">                <span class="attr">&quot;interval&quot;</span><span class="punctuation">:</span> <span class="number">1000000</span> <span class="comment">// 步幅</span></span><br><span class="line">            <span class="punctuation">&#125;</span></span><br><span class="line">        <span class="punctuation">&#125;</span></span><br><span class="line">    <span class="punctuation">&#125;</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br><span class="line"><span class="comment">// date_histogram</span></span><br><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">    <span class="attr">&quot;aggs&quot;</span><span class="punctuation">:</span><span class="punctuation">&#123;</span></span><br><span class="line">        <span class="attr">&quot;定义分组名称（最外层）&quot;</span><span class="punctuation">:</span><span class="punctuation">&#123;</span></span><br><span class="line">            <span class="attr">&quot;histogram&quot;</span><span class="punctuation">:</span><span class="punctuation">&#123;</span></span><br><span class="line">                <span class="attr">&quot;field&quot;</span><span class="punctuation">:</span> <span class="string">&quot;price&quot;</span><span class="punctuation">,</span></span><br><span class="line">                <span class="attr">&quot;interval&quot;</span><span class="punctuation">:</span> year <span class="comment">// year、quarter、month、week、day、hour、minute、second</span></span><br><span class="line">            <span class="punctuation">&#125;</span></span><br><span class="line">        <span class="punctuation">&#125;</span></span><br><span class="line">    <span class="punctuation">&#125;</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br><span class="line"><span class="comment">// 排序</span></span><br><span class="line"></span><br></pre></td></tr></table></figure></li>
 </ul>
 <h3 id="8-ES的写入和查询已经实时查询"><a href="#8-ES的写入和查询已经实时查询" class="headerlink" title="8.ES的写入和查询已经实时查询"></a>8.ES的写入和查询已经实时查询</h3><ul>
 <li><p><strong>写入流程</strong></p>
@@ -337,7 +596,7 @@
 <li><p>对已存在的mapping映射进行修改</p>
 <blockquote>
 <p>新建索引–&gt;导入原有数据–&gt;为索引新建别名–&gt;删除旧索引</p>
-<figure class="highlight json"><table><tr><td class="code"><pre><span class="line">## 导入操作</span><br><span class="line">POST _reindex</span><br><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">    <span class="attr">&quot;source&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">        <span class="attr">&quot;index&quot;</span><span class="punctuation">:</span> <span class="string">&quot;旧索引&quot;</span></span><br><span class="line">    <span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;dest&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">        <span class="attr">&quot;index&quot;</span><span class="punctuation">:</span> <span class="string">&quot;新索引&quot;</span></span><br><span class="line">    <span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight json"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 导入操作</span></span><br><span class="line">POST _reindex</span><br><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">    <span class="attr">&quot;source&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">        <span class="attr">&quot;index&quot;</span><span class="punctuation">:</span> <span class="string">&quot;旧索引&quot;</span></span><br><span class="line">    <span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;dest&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">        <span class="attr">&quot;index&quot;</span><span class="punctuation">:</span> <span class="string">&quot;新索引&quot;</span></span><br><span class="line">    <span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
 </blockquote>
 </li>
 <li><p>多个索引查询</p>
@@ -347,8 +606,48 @@
 </li>
 <li><p>Elasticsearch乐观并发控制</p>
 <blockquote>
-<figure class="highlight json"><table><tr><td class="code"><pre><span class="line"># <span class="number">7</span>以前，使用version控制</span><br><span class="line">PUT /db_index/_doc/<span class="number">1</span>?version=<span class="number">1</span></span><br><span class="line"># <span class="number">7</span>和<span class="number">7</span>以后，if_seq_no=版本值&amp;if_primary_term=分片计数，每当Primary Shard发生重新分配，_primary_term就会加<span class="number">1</span>，version属于当前这条数据，而seq_no属于整个index</span><br><span class="line">POST /db_index/_update/<span class="number">1</span>/?if_seq_no=<span class="number">5</span>&amp;if_primary_term=<span class="number">1</span></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<figure class="highlight json"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 7以前，使用version控制</span></span><br><span class="line">PUT /db_index/_doc/<span class="number">1</span>?version=<span class="number">1</span></span><br><span class="line"><span class="comment">// 7和7以后，if_seq_no=版本值&amp;if_primary_term=分片计数，每当Primary Shard发生重新分配，_primary_term就会加1，version属于当前这条数据，而seq_no属于整个index</span></span><br><span class="line">POST /db_index/_update/<span class="number">1</span>/?if_seq_no=<span class="number">5</span>&amp;if_primary_term=<span class="number">1</span></span><br><span class="line"></span><br></pre></td></tr></table></figure>
 
+</blockquote>
+</li>
+<li><p>ES的脑裂问题</p>
+<blockquote>
+<p>所谓脑裂问题，就是同一个集群中的不同节点，对于集群的状态有了不一样的理解， 比如集群中存在两个master</p>
+<p><strong>产生原因</strong>：1.网络问题 2.Master身份节点假死</p>
+<p>解决：discovery.zen.minimum_master_nodes：master候选节点数量 &#x2F; 2 + 1，只有半数+1的候选节点认为master身份的master节点下线了，才能进行选举。</p>
+<p>脑裂时，如果时master身份的master节点被脑裂出去了，master身份的节点不能连接半数以上的master节点，则此master身份被取消，又不能进行重新选举则没有master身份的master节点</p>
+</blockquote>
+</li>
+<li><p>text类型的字段不支持聚合查询</p>
+<blockquote>
+<p>解决方案：</p>
+<ul>
+<li>对于要聚合的字段加<code>.keyword</code></li>
+</ul>
+<figure class="highlight json"><table><tr><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">    <span class="attr">&quot;mappings&quot;</span><span class="punctuation">:</span><span class="punctuation">&#123;</span></span><br><span class="line">        <span class="attr">&quot;properties&quot;</span><span class="punctuation">:</span><span class="punctuation">&#123;</span></span><br><span class="line">            <span class="attr">&quot;name&quot;</span><span class="punctuation">:</span><span class="punctuation">&#123;</span></span><br><span class="line">                <span class="attr">&quot;type&quot;</span> <span class="punctuation">:</span> <span class="string">&quot;text&quot;</span><span class="punctuation">,</span></span><br><span class="line">				<span class="attr">&quot;fields&quot;</span><span class="punctuation">:</span><span class="punctuation">&#123;</span></span><br><span class="line">                    <span class="attr">&quot;keyword&quot;</span> <span class="punctuation">:</span><span class="punctuation">&#123;</span></span><br><span class="line">                        <span class="attr">&quot;type&quot;</span> <span class="punctuation">:</span> <span class="string">&quot;keyword&quot;</span></span><br><span class="line">                    <span class="punctuation">&#125;</span></span><br><span class="line">                <span class="punctuation">&#125;</span></span><br><span class="line">            <span class="punctuation">&#125;</span></span><br><span class="line">        <span class="punctuation">&#125;</span></span><br><span class="line">    <span class="punctuation">&#125;</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br><span class="line"><span class="comment">// 聚合时使用name.keyword</span></span><br><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">    <span class="attr">&quot;aggs&quot;</span><span class="punctuation">:</span><span class="punctuation">&#123;</span></span><br><span class="line">        <span class="attr">&quot;定义分组名称（最外层）&quot;</span><span class="punctuation">:</span><span class="punctuation">&#123;</span></span><br><span class="line">            <span class="attr">&quot;分组策略如：terms、avg、sum、max、min、&quot;</span><span class="punctuation">:</span><span class="punctuation">&#123;</span></span><br><span class="line">                <span class="attr">&quot;field&quot;</span><span class="punctuation">:</span><span class="string">&quot;name.keyword&quot;</span><span class="punctuation">,</span></span><br><span class="line">                <span class="attr">&quot;其他参数&quot;</span><span class="punctuation">:</span><span class="string">&quot;&quot;</span><span class="punctuation">,</span></span><br><span class="line">    			<span class="comment">// 排序</span></span><br><span class="line">    			<span class="attr">&quot;order&quot;</span><span class="punctuation">:</span><span class="punctuation">&#123;</span></span><br><span class="line">    				<span class="attr">&quot;分组名称1&quot;</span><span class="punctuation">:</span><span class="string">&quot;desc&quot;</span></span><br><span class="line">				<span class="punctuation">&#125;</span></span><br><span class="line">            <span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">            <span class="attr">&quot;aggs&quot;</span><span class="punctuation">:</span><span class="punctuation">&#123;</span></span><br><span class="line">                <span class="attr">&quot;分组名称1&quot;</span><span class="punctuation">:</span><span class="punctuation">&#123;</span><span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">                <span class="attr">&quot;分组名称2&quot;</span><span class="punctuation">:</span><span class="punctuation">&#123;</span><span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">        	<span class="punctuation">&#125;</span></span><br><span class="line">        <span class="punctuation">&#125;</span></span><br><span class="line">    <span class="punctuation">&#125;</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
+
+
+</blockquote>
+</li>
+<li><p>父子文档</p>
+<blockquote>
+<p>设置父文档</p>
+<figure class="highlight json"><table><tr><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">    <span class="attr">&quot;mappings&quot;</span><span class="punctuation">:</span><span class="punctuation">&#123;</span></span><br><span class="line">        <span class="attr">&quot;properties&quot;</span><span class="punctuation">:</span><span class="punctuation">&#123;</span></span><br><span class="line">            <span class="attr">&quot;my_jion_field&quot;</span><span class="punctuation">:</span><span class="punctuation">&#123;</span><span class="comment">// 定义关联名称</span></span><br><span class="line">                <span class="attr">&quot;type&quot;</span><span class="punctuation">:</span><span class="string">&quot;join&quot;</span><span class="punctuation">,</span></span><br><span class="line">                <span class="attr">&quot;relations&quot;</span><span class="punctuation">:</span><span class="punctuation">&#123;</span><span class="comment">// 声明关系</span></span><br><span class="line">                    <span class="attr">&quot;myP&quot;</span><span class="punctuation">:</span><span class="string">&quot;myC&quot;</span>     <span class="comment">// 父名称:子名称</span></span><br><span class="line">                <span class="punctuation">&#125;</span></span><br><span class="line">            <span class="punctuation">&#125;</span></span><br><span class="line">        <span class="punctuation">&#125;</span></span><br><span class="line">    <span class="punctuation">&#125;</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br><span class="line"><span class="comment">// 插入父子文档时需增加my_jion_field属性,7和7以后没有type这一层，则父子文档平铺在同一个索引中</span></span><br><span class="line">PUT XX/XX/父id</span><br><span class="line"><span class="punctuation">&#123;</span><span class="comment">//父文档增加属性</span></span><br><span class="line">    <span class="attr">&quot;my_jion_field&quot;</span><span class="punctuation">:</span><span class="punctuation">&#123;</span></span><br><span class="line">        <span class="attr">&quot;name&quot;</span><span class="punctuation">:</span><span class="string">&quot;myP&quot;</span></span><br><span class="line">    <span class="punctuation">&#125;</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br><span class="line"></span><br><span class="line">PUT XX/XX/子id?routing=父id</span><br><span class="line"><span class="punctuation">&#123;</span><span class="comment">//子档增加属性</span></span><br><span class="line">    <span class="attr">&quot;my_jion_field&quot;</span><span class="punctuation">:</span><span class="punctuation">&#123;</span></span><br><span class="line">        <span class="attr">&quot;name&quot;</span><span class="punctuation">:</span><span class="string">&quot;myP&quot;</span><span class="punctuation">,</span></span><br><span class="line"> 		<span class="attr">&quot;parent&quot;</span><span class="punctuation">:</span>父id</span><br><span class="line">    <span class="punctuation">&#125;</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
+
+<p>查询子文档内容 has_child,返回父文档</p>
+<figure class="highlight json"><table><tr><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">    <span class="attr">&quot;query&quot;</span><span class="punctuation">:</span><span class="punctuation">&#123;</span></span><br><span class="line">        <span class="attr">&quot;has_child&quot;</span><span class="punctuation">:</span><span class="punctuation">&#123;</span></span><br><span class="line">            <span class="attr">&quot;type&quot;</span><span class="punctuation">:</span><span class="string">&quot;myC&quot;</span><span class="punctuation">,</span> <span class="comment">//其 child所在 type </span></span><br><span class="line">            <span class="attr">&quot;query&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span>                     <span class="comment">//其 parent 必须满足以下 query 条件</span></span><br><span class="line">                <span class="attr">&quot;match&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">                  <span class="attr">&quot;name&quot;</span><span class="punctuation">:</span> <span class="string">&quot;Alice Smith&quot;</span>   <span class="comment">//其 子文档中的属性和属性满足的条件</span></span><br><span class="line">                <span class="punctuation">&#125;</span></span><br><span class="line">        	<span class="punctuation">&#125;</span></span><br><span class="line">    <span class="punctuation">&#125;</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
+
+<p>查询父文档内容 has_parent,返回子文档</p>
+<figure class="highlight json"><table><tr><td class="code"><pre><span class="line"><span class="comment">//查询某文档，只有该文档有&quot;父文档&quot;且满足一定条件才算匹配</span></span><br><span class="line"><span class="punctuation">&#123;</span><span class="attr">&quot;has_parent&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span>                <span class="comment">//文档是否有 parent</span></span><br><span class="line">      <span class="attr">&quot;type&quot;</span><span class="punctuation">:</span> <span class="string">&quot;myP&quot;</span><span class="punctuation">,</span>         <span class="comment">//其 parent 所在 type 必须是 myP</span></span><br><span class="line">      <span class="attr">&quot;query&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span>                <span class="comment">//其 parent 必须满足以下 query 条件</span></span><br><span class="line">        <span class="attr">&quot;match&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">          <span class="attr">&quot;country&quot;</span><span class="punctuation">:</span> <span class="string">&quot;UK&quot;</span>   <span class="comment">//其 父文档中的属性和属性满足的条件</span></span><br><span class="line">        <span class="punctuation">&#125;</span></span><br><span class="line">      <span class="punctuation">&#125;</span></span><br><span class="line">    <span class="punctuation">&#125;</span>                           </span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
+
+<p>parent_id查询返回子文档</p>
+<figure class="highlight json"><table><tr><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">    <span class="attr">&quot;query&quot;</span><span class="punctuation">:</span><span class="punctuation">&#123;</span></span><br><span class="line">        <span class="attr">&quot;parent_id&quot;</span><span class="punctuation">:</span><span class="punctuation">&#123;</span></span><br><span class="line">            <span class="attr">&quot;type&quot;</span><span class="punctuation">:</span><span class="string">&quot;myC&quot;</span><span class="punctuation">,</span><span class="comment">// 子文档type</span></span><br><span class="line">            <span class="attr">&quot;id&quot;</span><span class="punctuation">:</span>父id <span class="comment">//父id</span></span><br><span class="line">        <span class="punctuation">&#125;</span></span><br><span class="line">    <span class="punctuation">&#125;</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
+</blockquote>
+</li>
+<li><p>嵌套对象 v.s 父子文档</p>
+<blockquote>
+<p>优点：父子文档存储在一起，读取性能高、父子文档可以独立更新</p>
+<p>缺点：更新嵌套的子文档时，需要更新整个文档、需要额外的内存去维护关系。读取性能 相对差</p>
 </blockquote>
 </li>
 </ul>
@@ -358,265 +657,6 @@
       </categories>
       <tags>
         <tag>ElasticSearch</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>RPC和Dubbo初识</title>
-    <url>/2022/10/07/RPC%E5%92%8CDubbo%E5%88%9D%E8%AF%86/</url>
-    <content><![CDATA[<h1 id="RPC和Dubbo初识"><a href="#RPC和Dubbo初识" class="headerlink" title="RPC和Dubbo初识"></a>RPC和Dubbo初识</h1><span id="more"></span>
-
-<h3 id="RPC初识"><a href="#RPC初识" class="headerlink" title="RPC初识"></a>RPC初识</h3><p><strong>1.概念</strong></p>
-<ul>
-<li>RPC:远程过程调用，是一个计算机通讯协议。该协议允许一台计算机程序调用另一个地址空间的子程序，即可以像调用本地方法一样调用远程方法。</li>
-</ul>
-<p><strong>2.传输协议</strong></p>
-<ul>
-<li>RPC over Http：基于Http协议来传输数据</li>
-<li>PRC over Tcp：基于Tcp协议来传输数据</li>
-</ul>
-<h3 id="Dubbo初识"><a href="#Dubbo初识" class="headerlink" title="Dubbo初识"></a>Dubbo初识</h3><p><strong>1.概念图</strong></p>
-<p><img src="/pictures/dubbo-01.png" alt="alt dubbo信息"></p>
-<p><strong>2.概念</strong></p>
-<p>Apache Dubbo 是⼀款⾼性能、轻量级的开源 Java 服务框架，涉猎服务治理、服务监控、服务⽹关等等。</p>
-<p><strong>3.本地缓存注册信息</strong></p>
-<ul>
-<li>如果程序运行中注册中心宕机了，服务依旧会调用成功，因为dubbo客户端连接注册中心时会本地缓存一份注册信息，程序调用时会读取缓存中的注册信息</li>
-<li>注册中心中客户端订阅的注册信息发送变化时，注册中心会通知客户端就行更新</li>
-</ul>
-<h3 id="Dubbo功能"><a href="#Dubbo功能" class="headerlink" title="Dubbo功能"></a>Dubbo功能</h3><p><strong>1.负载均衡</strong>(默认：random)</p>
-<ul>
-<li>服务端和客户端都能配置负载均衡策略，如果客户端和服务端都配置了则以客户端配置为准</li>
-<li>负载均衡逻辑在客户端的代码中实现，最少活跃调用数是在客户端统计，调用开始时active+1，调用结束后active-1，active为活跃数</li>
-<li>负载均衡策略：<strong>随机</strong>（可以按权重配置），<strong>轮询</strong>（可以按权重配置），<strong>最少活跃调用数</strong>，<strong>一致性 Hash</strong></li>
-</ul>
-<p><strong>2.服务超时</strong></p>
-<ul>
-<li>服务端和客户端可以配置服务超时时间，如果只有一端配置了超时时间则时程序超时时间</li>
-<li>客户端超时之后会<strong>抛</strong>超时异常，但是服务端超时之后<strong>只</strong>打印⼀个超时⽇志</li>
-<li>异步调用也是有超时的，但是<strong>容错和mock</strong>（像同步那样设置时）不生效。</li>
-</ul>
-<p><strong>3.集群容错</strong>(默认：失败自动重试，<code>retries=&quot;2&quot;</code> 来设置重试次数(不含第一次))</p>
-<ul>
-<li><p>客户端调用失败(一般指RpcException(如:超时),程序运行中业务throw Exception不会重试)之后，执行配置的容错策略，比如：重新调用其他的服务</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">//服务端会把业务抛出的异常(超时会包装为RpcException)放到appResponse的Throwable exception属性中，并把异常包装为RuntimeException,异步调用没有容错机制</span></span><br><span class="line"><span class="comment">//mock机制判断异常时，代码：result.getException() instanceof RpcException</span></span><br><span class="line">result = <span class="built_in">this</span>.invoker.invoke(invocation);</span><br><span class="line"><span class="keyword">if</span>(result.getException() != <span class="literal">null</span> &amp;&amp; result.getException() <span class="keyword">instanceof</span> RpcException)&#123; mock返回&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">FailoverClusterInvoker</span>&lt;T&gt; <span class="keyword">extends</span> <span class="title class_">AbstractClusterInvoker</span>&lt;T&gt; &#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> Result <span class="title function_">doInvoke</span><span class="params">(Invocation invocation, <span class="keyword">final</span> List&lt;Invoker&lt;T&gt;&gt; invokers, LoadBalance loadbalance)</span> <span class="keyword">throws</span> 				RpcException &#123;</span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">0</span>; i &lt; len; i++) &#123;</span><br><span class="line">            <span class="keyword">try</span>&#123;</span><br><span class="line">                <span class="type">Result</span> <span class="variable">result</span> <span class="operator">=</span> invoker.invoke(invocation);</span><br><span class="line">			<span class="comment">//框架抛出的异常，服务端业务抛出的异常会进行封装</span></span><br><span class="line">            &#125; <span class="keyword">catch</span> (RpcException e) &#123;</span><br><span class="line">                <span class="keyword">if</span> (e.isBiz()) &#123; <span class="comment">// 业务异常</span></span><br><span class="line">                    <span class="keyword">throw</span> e;</span><br><span class="line">                &#125;</span><br><span class="line">                le = e;<span class="comment">//继续for循环</span></span><br><span class="line">            &#125; <span class="keyword">catch</span> (Throwable e) &#123;</span><br><span class="line">                le = <span class="keyword">new</span> <span class="title class_">RpcException</span>(e.getMessage(), e);<span class="comment">//继续for循环</span></span><br><span class="line">            &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">                providers.add(invoker.getUrl().getAddress());</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p><img src="/pictures/dubbo-02.png" alt="alt dubbo-Exception"></p>
-</li>
-<li><p>集群容错模式：</p>
-<blockquote>
-<ul>
-<li>Failfast Cluster(快速失败，只发起一次调用，失败立即报错)</li>
-<li>Failsafe Cluster(失败安全，出现异常时，直接忽略)</li>
-<li>Failback Cluster(失败自动恢复，后台记录失败请求，定时重发)</li>
-<li>Forking Cluster(并行调用多个服务器，只要一个成功即返回)</li>
-<li>Broadcast Cluster(广播调用所有提供者，逐个调用，任意一台报错则报错)</li>
-</ul>
-</blockquote>
-</li>
-</ul>
-<p><strong>4.服务降级</strong></p>
-<ul>
-<li><p>服务提供者报错了，所采取的措施，如报错后返回fail等信息</p>
-</li>
-<li><p>集群容错和服务降级的区别</p>
-<blockquote>
-<p>集群容错是整个集群范围内的容错</p>
-<p>服务降级是单个服务提供者的⾃身容错</p>
-</blockquote>
-</li>
-</ul>
-<p><strong>5.本地存根</strong></p>
-<ul>
-<li>本地存根就是⼀段逻辑，这段逻辑是在服务消费端执⾏的,</li>
-</ul>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">//客户端需要提供存根（Stub）</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">BarServiceStub</span> <span class="keyword">implements</span> <span class="title class_">BarService</span> &#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> BarService barService;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 构造函数传入真正的远程代理对象</span></span><br><span class="line">    <span class="keyword">public</span> <span class="title function_">BarServiceStub</span><span class="params">(BarService barService)</span>&#123;</span><br><span class="line">        <span class="built_in">this</span>.barService = barService;</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    <span class="keyword">public</span> String <span class="title function_">sayHello</span><span class="params">(String name)</span> &#123;</span><br><span class="line">        <span class="comment">// 此代码在客户端执行, 你可以在客户端做ThreadLocal本地缓存，或预先验证参数是否合法，等等</span></span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            <span class="keyword">return</span> barService.sayHello(name);</span><br><span class="line">        &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">            <span class="comment">// 你可以容错，可以做任何AOP拦截事项</span></span><br><span class="line">            <span class="keyword">return</span> <span class="string">&quot;容错数据&quot;</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p><strong>6.本地伪装</strong></p>
-<ul>
-<li>本地伪装就是Mock</li>
-</ul>
-<p><strong>7.参数回调</strong></p>
-<ul>
-<li>客户端调用服务端后，服务端的逻辑需要调用客户端。例：<a href="http://dubbo.apache.org/zh/docs/v2.7/user/examples/callback-parameter/">http://dubbo.apache.org/zh/docs/v2.7/user/examples/callback-parameter/</a></li>
-</ul>
-<p><strong>8.异步调用</strong></p>
-<p><strong>9.泛化调用和泛化调用服务</strong></p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Reference(id = &quot;xxxxService&quot;, version = &quot;default&quot;, interfaceName = &quot;com.xxx.XxxService&quot;, generic = true)</span></span><br><span class="line"><span class="keyword">private</span> GenericService genericService;</span><br><span class="line"></span><br><span class="line"><span class="meta">@Service(interfaceName = &quot;com.tuling.XxxService&quot;, version = &quot;generic&quot;)</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">GenericDemoService</span> <span class="keyword">implements</span> <span class="title class_">GenericService</span></span><br></pre></td></tr></table></figure>
-
-<p><strong>10.Dubbo中的REST</strong></p>
-<h3 id="控制台"><a href="#控制台" class="headerlink" title="控制台"></a>控制台</h3><ul>
-<li>控制台可以动态配置或修改服务参数，配置路由规则，和tag配置(客户端中发送的tag来转发到特定的服务端，即实现蓝绿发布，灰度发布)</li>
-</ul>
-<h3 id="dubbo常识"><a href="#dubbo常识" class="headerlink" title="dubbo常识"></a>dubbo常识</h3><ul>
-<li><p>dubbo自带的配置中心的配置大于代码中的配置(<strong>默认是大于的，可以配置为配置中心优先级小于代码中的配置</strong>)，代码中的配置（类中的配置&gt;application中的配置）</p>
-</li>
-<li><p><strong>port+path&#x2F;name+version+group</strong>作为服务的key进行查找服务并执行服务的</p>
-</li>
-<li><p><strong>@Activate</strong>注解</p>
-<blockquote>
-<p>这个注解的属性有：</p>
-<ul>
-<li>String[] group()：表示这个扩展点是属于哪组的，这⾥组通常分为PROVIDER和CONSUMER，表示 该扩展点能在服务提供者端，或者消费端使⽤</li>
-<li>String[] value()：表示的是URL中的某个参数key，当利⽤getActivateExtension⽅法来寻找扩展点 时，如果传⼊的url中包含的参数的所有key中，包括了当前扩展点中的value值，那么则表示当前url可 以使⽤该扩展点。</li>
-</ul>
-<p>使用</p>
-<ul>
-<li>类中或方法中使用@Activate</li>
-<li>SPI文件中增加@Activate的类的全路径类名</li>
-</ul>
-</blockquote>
-</li>
-<li><p>dubbo调用时直接负载均衡获取Invoker类，然后进行调用，不会在查询注册信息，如果注册中心的注册信息发生改变时，Invoker就会改变。</p>
-</li>
-</ul>
-]]></content>
-      <categories>
-        <category>JAVA</category>
-      </categories>
-      <tags>
-        <tag>Dubbo</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>JAVA程序打war包-idea</title>
-    <url>/2022/09/19/JAVA%E7%A8%8B%E5%BA%8F%E6%89%93war%E5%8C%85-idea/</url>
-    <content><![CDATA[<h1 id="JAVA程序打war包-idea"><a href="#JAVA程序打war包-idea" class="headerlink" title="JAVA程序打war包(idea)"></a>JAVA程序打war包(idea)</h1><span id="more"></span>
-
-<ul>
-<li><h2 id="war包设置"><a href="#war包设置" class="headerlink" title="war包设置"></a>war包设置</h2><blockquote>
-<p>1.File -&gt; Project Structure</p>
-</blockquote>
-</li>
-</ul>
-<p><img src="/pictures/2-1.png" alt="alt 2-1"></p>
-<p><img src="/pictures/2-2.png" alt="alt 2-2"></p>
-<ul>
-<li><h2 id="war包编译设置"><a href="#war包编译设置" class="headerlink" title="war包编译设置"></a>war包编译设置</h2></li>
-</ul>
-<blockquote>
-<p>1.设置工程打包路径</p>
-</blockquote>
-<p><img src="/pictures/2-3.png" alt="alt 2-3"></p>
-<blockquote>
-<p>2.加入class和lib</p>
-</blockquote>
-<p><img src="/pictures/2-4.png" alt="alt 2-4"></p>
-<p><img src="/pictures/2-5.png" alt="alt 2-5"></p>
-<ul>
-<li><h2 id="打包"><a href="#打包" class="headerlink" title="打包"></a>打包</h2></li>
-</ul>
-<blockquote>
-<p>Build -&gt; Build Artifacts -&gt; Build</p>
-</blockquote>
-<p><img src="/pictures/2-6.png" alt="alt 2-6"></p>
-<p><img src="/pictures/2-7.png" alt="alt 2-7"></p>
-<ul>
-<li><h2 id="注意设置java编译路径"><a href="#注意设置java编译路径" class="headerlink" title="注意设置java编译路径"></a>注意设置java编译路径</h2></li>
-</ul>
-<blockquote>
-<p>1.File -&gt; Project Structure -&gt; Project</p>
-</blockquote>
-<p><img src="/pictures/2-8.jpg" alt="alt 2-8"></p>
-]]></content>
-      <categories>
-        <category>idea使用</category>
-      </categories>
-      <tags>
-        <tag>IDEA</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>hexo-next新增文章</title>
-    <url>/2022/09/19/hexo-next%E6%96%B0%E5%A2%9E%E6%96%87%E7%AB%A0/</url>
-    <content><![CDATA[<h1 id="hexo-next新增文章"><a href="#hexo-next新增文章" class="headerlink" title="hexo-next新增文章"></a>hexo-next新增文章</h1><span id="more"></span>
-
-<h2 id="安装hexo"><a href="#安装hexo" class="headerlink" title="安装hexo"></a>安装hexo</h2><blockquote>
-<p>1.安装node.js和git</p>
-<p>2.安装hexo</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">#安装hexo</span><br><span class="line">npm install -g hexo</span><br><span class="line">#新建自己的项目文件夹(myproject)并进入自己的项目文件夹</span><br><span class="line">cd myproject</span><br><span class="line">hexo init</span><br><span class="line">#安装依赖</span><br><span class="line">npm install</span><br><span class="line">#hexo编译和启动</span><br><span class="line">hexo g</span><br><span class="line">hexo s</span><br><span class="line">#访问http://localhost:4000,查看hexo是否搭建成功</span><br></pre></td></tr></table></figure>
-
-<p>3.安装git插件</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">npm install hexo-deployer-git --save</span><br></pre></td></tr></table></figure>
-</blockquote>
-<h1 id="安装hexo-next"><a href="#安装hexo-next" class="headerlink" title="安装hexo-next"></a>安装hexo-next</h1><blockquote>
-<p>1.安装hexo-next插件</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">&gt;#先myproject目录下执行</span><br><span class="line">&gt;git clone https://github.com/theme-next/hexo-theme-next.git</span><br><span class="line">&gt;#修改myproject目录下的_conf.yml</span><br><span class="line">&gt;theme: next</span><br></pre></td></tr></table></figure>
-</blockquote>
-<p><img src="/pictures/update_hexo_config.png" alt="alt 修改config"></p>
-<h1 id="参数配置"><a href="#参数配置" class="headerlink" title="参数配置"></a>参数配置</h1><p>1.myproject&#x2F;_config.yml</p>
-<blockquote>
-<figure class="highlight yaml"><table><tr><td class="code"><pre><span class="line"><span class="comment">## 中文</span></span><br><span class="line"><span class="attr">language:</span> <span class="string">zh-CN</span></span><br><span class="line"><span class="comment">## 时间统计</span></span><br><span class="line"><span class="attr">symbols_count_time:</span></span><br><span class="line">  <span class="comment"># 文章字数统计</span></span><br><span class="line">  <span class="attr">symbols:</span> <span class="literal">true</span></span><br><span class="line">  <span class="comment"># 文章阅读时间统计</span></span><br><span class="line">  <span class="attr">time:</span> <span class="literal">true</span></span><br><span class="line">  <span class="comment"># 网站总字数统计</span></span><br><span class="line">  <span class="attr">total_symbols:</span> <span class="literal">true</span></span><br><span class="line">  <span class="comment"># 网站总阅读时间统计</span></span><br><span class="line">  <span class="attr">total_time:</span> <span class="literal">true</span></span><br><span class="line">  <span class="attr">exclude_codeblock:</span> <span class="literal">false</span></span><br><span class="line"><span class="comment">#搜索 防止部署之后一致加载搜索</span></span><br><span class="line"><span class="attr">search:</span></span><br><span class="line">  <span class="attr">path:</span> <span class="string">search.xml</span></span><br><span class="line">  <span class="attr">field:</span> <span class="string">post</span></span><br><span class="line">  <span class="attr">format:</span> <span class="string">html</span></span><br><span class="line">  <span class="attr">limit:</span> <span class="number">10000</span></span><br></pre></td></tr></table></figure>
-
-<p>2.myproject&#x2F;themes&#x2F;next&#x2F;_config.yml</p>
-<figure class="highlight yaml"><table><tr><td class="code"><pre><span class="line"><span class="comment">## 时间统计</span></span><br><span class="line"><span class="attr">symbols_count_time:</span></span><br><span class="line">  <span class="comment">## 是否另起一行</span></span><br><span class="line">  <span class="attr">separated_meta:</span> <span class="literal">true</span></span><br><span class="line">  <span class="comment">## 首页统计数量前是否显示文字</span></span><br><span class="line">  <span class="attr">item_text_post:</span> <span class="literal">true</span></span><br><span class="line">  <span class="comment">## 底部统计数量前是否显示文字</span></span><br><span class="line">  <span class="attr">item_text_total:</span> <span class="literal">false</span></span><br><span class="line">  <span class="comment">## 平均字长</span></span><br><span class="line">  <span class="attr">awl:</span> <span class="number">4</span></span><br><span class="line">  <span class="comment">## 每分钟阅读字数</span></span><br><span class="line">  <span class="attr">wpm:</span> <span class="number">300</span></span><br><span class="line">  <span class="comment"># 站点预览</span></span><br><span class="line"><span class="attr">avatar:</span></span><br><span class="line">  <span class="comment"># Replace the default image and set the url here.目录为source为根目录</span></span><br><span class="line">  <span class="attr">url:</span> <span class="string">/images/avatar.gif</span></span><br><span class="line">  <span class="comment"># If true, the avatar will be dispalyed in circle.</span></span><br><span class="line">  <span class="attr">rounded:</span> <span class="literal">true</span></span><br><span class="line">  <span class="comment"># If true, the avatar will be rotated with the cursor.</span></span><br><span class="line">  <span class="attr">rotated:</span> <span class="literal">false</span></span><br></pre></td></tr></table></figure>
-
-
-</blockquote>
-<h1 id="新建文章"><a href="#新建文章" class="headerlink" title="新建文章"></a>新建文章</h1><blockquote>
-<p>1.新建文章(文章名称:doc)</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">hexo new doc</span><br></pre></td></tr></table></figure>
-
-<p>2.使用markdown编辑器修改文章</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">#文章目录</span><br><span class="line">/myproject/_posts/doc</span><br></pre></td></tr></table></figure>
-</blockquote>
-<h1 id="发布文章"><a href="#发布文章" class="headerlink" title="发布文章"></a>发布文章</h1><blockquote>
-<p>1.修改myproject目录下的_conf.yml配置文件</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">#修改deploy属性</span><br></pre></td></tr></table></figure>
-
-<p><img src="/pictures/update_display_config.jpg" alt="alt 修改config"></p>
-<p>2.发布命令</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">hexo d</span><br></pre></td></tr></table></figure></blockquote>
-]]></content>
-      <categories>
-        <category>hexo</category>
-      </categories>
-      <tags>
-        <tag>hexo</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>自动注入@Autowired和@Resource</title>
-    <url>/2022/09/19/%E8%87%AA%E5%8A%A8%E6%B3%A8%E5%85%A5-Autowired%E5%92%8C-Resource/</url>
-    <content><![CDATA[<h1 id="自动注入-Autowired和-Resource"><a href="#自动注入-Autowired和-Resource" class="headerlink" title="自动注入@Autowired和@Resource"></a>自动注入@Autowired和@Resource</h1><span id="more"></span>
-
-<h4 id="1-来源不同"><a href="#1-来源不同" class="headerlink" title="1.来源不同"></a>1.来源不同</h4><blockquote>
-<ul>
-<li>@Autowired来自Spring，全路径类名为：org.springframework.beans.factory.annotation.Autowired</li>
-<li>@Resource 来自JDK，全路径类名为：javax.annotation.Resource</li>
-</ul>
-</blockquote>
-<h4 id="2-注入方式不同"><a href="#2-注入方式不同" class="headerlink" title="2.注入方式不同"></a>2.注入方式不同</h4><blockquote>
-<p><del>大家的常识似乎为@Autowired是根据类型注入的，如果两个类实现同一个接口就不能用@Autowired</del>，<strong>但这个常识是错误的</strong></p>
-<p>@Autowired的注入方式为：</p>
-<ul>
-<li>如果查询结果刚好为一个，就将该bean装配给@Autowired指定的数据</li>
-<li>如果查询的结果不止一个，先根据 @Primary 来决策，其次是 @Priority 决策优先级</li>
-<li>最后是根据 Bean 名字的严格匹配来决策</li>
-</ul>
-<p><img src="/pictures/autowire.png" alt="alt 修改config"></p>
-<p>@Resource的注入方式为：</p>
-<ul>
-<li>如果没有指定name和type属性的话，默认首先使用属性名称作为bean name进行注入，如果查询不到，则使用属性的类型进行查找注入</li>
-<li>如果指定了name和type其中一个，就按照指定的来进行注入，找不到或者找到多个，都会抛出异常</li>
-<li>如果同时指定了name和type，则从Spring上下文中找到唯一匹配（类型和名称同时匹配）的bean进行装配，找不到则抛出异常</li>
-</ul>
-</blockquote>
-<h4 id="其他方面"><a href="#其他方面" class="headerlink" title="其他方面"></a>其他方面</h4><blockquote>
-<ul>
-<li><p>如果@Autowired想指定名称注入的话，一般用@Autowired+@Qualifie(“beanName”)的方式</p>
-</li>
-<li><p>@Autowired与@Resource都可以用来装配bean. 都可以写在字段上,或写在setter方法上。</p>
-</li>
-<li><p>@Autowired默认情况下必须要求依赖对象必须存在，如果要允许null值，可以设置它的required属性为false（@Autowired(required&#x3D;false)</p>
-</li>
-</ul>
-</blockquote>
-]]></content>
-      <categories>
-        <category>spring初识</category>
-      </categories>
-      <tags>
-        <tag>Spring</tag>
       </tags>
   </entry>
 </search>
