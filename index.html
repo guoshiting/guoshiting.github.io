@@ -189,6 +189,126 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/10/21/springboot%E9%85%8D%E7%BD%AE%E5%92%8C%E5%90%AF%E5%8A%A8/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="临渊">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="临渊#博客">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/10/21/springboot%E9%85%8D%E7%BD%AE%E5%92%8C%E5%90%AF%E5%8A%A8/" class="post-title-link" itemprop="url">springboot配置和启动</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-10-21 22:34:54" itemprop="dateCreated datePublished" datetime="2022-10-21T22:34:54+08:00">2022-10-21</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-10-22 22:07:50" itemprop="dateModified" datetime="2022-10-22T22:07:50+08:00">2022-10-22</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/springboot/" itemprop="url" rel="index"><span itemprop="name">springboot</span></a>
+                </span>
+            </span>
+
+          <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>765</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>1 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="springboot配置和启动"><a href="#springboot配置和启动" class="headerlink" title="springboot配置和启动"></a>springboot配置和启动</h1><h4 id="自动配置流程"><a href="#自动配置流程" class="headerlink" title="自动配置流程"></a>自动配置流程</h4><ul>
+<li>@SpringBootApplication中包含@EnableAutoConfiguration，@EnableAutoConfiguration中包含@Import({AutoConfigurationImportSelector.class})</li>
+<li>AutoConfigurationImportSelector类继承了DeferredImportSelector，而这个类扫描具有META-INF&#x2F;spring.factories文件</li>
+<li>把spring.factories中的类加载到spring容器的加载顺序中，进行加载；而大多数自动配置类中有@ConditionalOnBean容器中存在指定Bean才生效</li>
+<li>DeferredImportSelector的作用可以把扫描的文件中的类进行分组和排序</li>
+</ul>
+<h3 id="启动"><a href="#启动" class="headerlink" title="启动"></a>启动</h3><ul>
+<li>创建SpringApplication</li>
+</ul>
+<blockquote>
+<ol>
+<li>获取启动类 </li>
+<li>获取web应用类型 </li>
+<li>读取了spring.factroy中对外扩展的ApplicationContextInitializer  ,ApplicationListener </li>
+<li>根据main推算出所在的类</li>
+</ol>
+</blockquote>
+<ul>
+<li><p>run时</p>
+<blockquote>
+<ol>
+<li>读取 配置信息 </li>
+<li>创建spring上下文，初始化上下文</li>
+<li>调用refresh 加载ioc容器(加载所有的自动配置类和创建servlet容器),<strong>内置tomcat</strong>在onRefresh中实现了启动tomcat</li>
+<li>调用监听器(方便扩展)</li>
+</ol>
+<ul>
+<li><strong>外置tomcat</strong></li>
+</ul>
+<p>tomcat实现了servlet 3.0的规定，SPI加载META-INF&#x2F;services 文件夹中找到javax.servlet.ServletContainerInitializer接口，这个接口的实现类进行了 DispatcherServlet的创建绑定tomcat  和 springboot的启动和</p>
+</blockquote>
+</li>
+</ul>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="http://example.com/2022/10/15/ElasticSearch/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1163,20 +1283,20 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">7</span>
+          <span class="site-state-item-count">8</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">4</span>
+        <span class="site-state-item-count">5</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">6</span>
+        <span class="site-state-item-count">7</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
@@ -1212,12 +1332,12 @@
     <span class="post-meta-item-icon">
       <i class="fa fa-chart-area"></i>
     </span>
-    <span title="站点总字数">18k</span>
+    <span title="站点总字数">19k</span>
     <span class="post-meta-divider">|</span>
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="站点阅读时长">16 分钟</span>
+    <span title="站点阅读时长">17 分钟</span>
 </div>
   <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动
   </div>

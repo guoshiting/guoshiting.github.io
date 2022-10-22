@@ -1,37 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
-    <title>Dubbo中SPI机制</title>
-    <url>/2022/10/09/Dubbo%E4%B8%ADSPI%E6%9C%BA%E5%88%B6/</url>
-    <content><![CDATA[<h1 id="Dubbo中SPI机制"><a href="#Dubbo中SPI机制" class="headerlink" title="Dubbo中SPI机制"></a>Dubbo中SPI机制</h1><span id="more"></span>
-
-<h3 id="JAVA的SPI"><a href="#JAVA的SPI" class="headerlink" title="JAVA的SPI"></a>JAVA的SPI</h3><ul>
-<li>SPI机制：是一种将服务接口与服务实现分离以达到解耦、提升了程序可扩展性的机制；通过本地的注册发现获取到具体的实现类，轻松可插拔</li>
-</ul>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 1.classpath下新建META-INF/services目录中新建接口全路径命名的文件,文件内写入SPI接口的实现类</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123;</span><br><span class="line">    ServiceLoader&lt;SpiInterface&gt; load = ServiceLoader.load(SpiInterface.class);</span><br><span class="line">    Iterator&lt;SpiInterface&gt; iterator = load.iterator();   </span><br><span class="line">    <span class="keyword">while</span> (iterator.hasNext()) &#123;</span><br><span class="line">       <span class="type">SpiInterface</span> <span class="variable">next</span> <span class="operator">=</span> iterator.next();</span><br><span class="line">       next.test(<span class="string">&quot;SPI demo&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<ul>
-<li>SPI使用例子：jdbc的jar包</li>
-</ul>
-<h3 id="Dubbo中SPI"><a href="#Dubbo中SPI" class="headerlink" title="Dubbo中SPI"></a>Dubbo中SPI</h3><ul>
-<li>例子:</li>
-</ul>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">ExtensionLoader&lt;Protocol&gt; extensionLoader = ExtensionLoader.getExtensionLoader(Protocol.class);</span><br><span class="line"><span class="type">Protocol</span> <span class="variable">http</span> <span class="operator">=</span> extensionLoader.getExtension(<span class="string">&quot;dubbo&quot;</span>);</span><br></pre></td></tr></table></figure>
-
-<ul>
-<li>dubbo加载目录：META-INF&#x2F;dubbo&#x2F;internal&#x2F;；META-INF&#x2F;dubbo&#x2F;；META-INF&#x2F;services&#x2F;，dubbo的SPI方法中的文件内容为key&#x3D;class</li>
-<li>如果文件中的类有有参构造方法且构造方法的参数有且只有接口类型的参数，就会加载为包装类，SPI获取类时如果有包装类则会获取包装类，获取的实体类则注入包装类</li>
-<li>@Adaptive的含义：SPI加载类时，如果类中需要注入setXXX时，需要从Spring和SPI的容器中获取对应的bean，如果spring中没有，SPI容器中找到有@Adaptive标注的类，如果没有的话， 则需要在响应的方法中加上@Adaptive生成代理方法，代理方法参数中必须有URL参数或者有getUrl方法，URL.put(“类名”，key)</li>
-</ul>
-]]></content>
-      <categories>
-        <category>JAVA</category>
-      </categories>
-      <tags>
-        <tag>Dubbo</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>BIO,NIO&amp;AIO认识以及Netty初识</title>
     <url>/2022/09/20/BIO-NIO-AIO%E8%AE%A4%E8%AF%86/</url>
     <content><![CDATA[<h1 id="BIO-NIO-amp-AIO认识及Netty初识"><a href="#BIO-NIO-amp-AIO认识及Netty初识" class="headerlink" title="BIO,NIO&amp;AIO认识及Netty初识"></a>BIO,NIO&amp;AIO认识及Netty初识</h1><span id="more"></span>
@@ -122,6 +91,37 @@
       </categories>
       <tags>
         <tag>Netty</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Dubbo中SPI机制</title>
+    <url>/2022/10/09/Dubbo%E4%B8%ADSPI%E6%9C%BA%E5%88%B6/</url>
+    <content><![CDATA[<h1 id="Dubbo中SPI机制"><a href="#Dubbo中SPI机制" class="headerlink" title="Dubbo中SPI机制"></a>Dubbo中SPI机制</h1><span id="more"></span>
+
+<h3 id="JAVA的SPI"><a href="#JAVA的SPI" class="headerlink" title="JAVA的SPI"></a>JAVA的SPI</h3><ul>
+<li>SPI机制：是一种将服务接口与服务实现分离以达到解耦、提升了程序可扩展性的机制；通过本地的注册发现获取到具体的实现类，轻松可插拔</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 1.classpath下新建META-INF/services目录中新建接口全路径命名的文件,文件内写入SPI接口的实现类</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123;</span><br><span class="line">    ServiceLoader&lt;SpiInterface&gt; load = ServiceLoader.load(SpiInterface.class);</span><br><span class="line">    Iterator&lt;SpiInterface&gt; iterator = load.iterator();   </span><br><span class="line">    <span class="keyword">while</span> (iterator.hasNext()) &#123;</span><br><span class="line">       <span class="type">SpiInterface</span> <span class="variable">next</span> <span class="operator">=</span> iterator.next();</span><br><span class="line">       next.test(<span class="string">&quot;SPI demo&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>SPI使用例子：jdbc的jar包</li>
+</ul>
+<h3 id="Dubbo中SPI"><a href="#Dubbo中SPI" class="headerlink" title="Dubbo中SPI"></a>Dubbo中SPI</h3><ul>
+<li>例子:</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">ExtensionLoader&lt;Protocol&gt; extensionLoader = ExtensionLoader.getExtensionLoader(Protocol.class);</span><br><span class="line"><span class="type">Protocol</span> <span class="variable">http</span> <span class="operator">=</span> extensionLoader.getExtension(<span class="string">&quot;dubbo&quot;</span>);</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>dubbo加载目录：META-INF&#x2F;dubbo&#x2F;internal&#x2F;；META-INF&#x2F;dubbo&#x2F;；META-INF&#x2F;services&#x2F;，dubbo的SPI方法中的文件内容为key&#x3D;class</li>
+<li>如果文件中的类有有参构造方法且构造方法的参数有且只有接口类型的参数，就会加载为包装类，SPI获取类时如果有包装类则会获取包装类，获取的实体类则注入包装类</li>
+<li>@Adaptive的含义：SPI加载类时，如果类中需要注入setXXX时，需要从Spring和SPI的容器中获取对应的bean，如果spring中没有，SPI容器中找到有@Adaptive标注的类，如果没有的话， 则需要在响应的方法中加上@Adaptive生成代理方法，代理方法参数中必须有URL参数或者有getUrl方法，URL.put(“类名”，key)</li>
+</ul>
+]]></content>
+      <categories>
+        <category>JAVA</category>
+      </categories>
+      <tags>
+        <tag>Dubbo</tag>
       </tags>
   </entry>
   <entry>
@@ -290,51 +290,6 @@
       </tags>
   </entry>
   <entry>
-    <title>自动注入@Autowired和@Resource</title>
-    <url>/2022/09/19/%E8%87%AA%E5%8A%A8%E6%B3%A8%E5%85%A5-Autowired%E5%92%8C-Resource/</url>
-    <content><![CDATA[<h1 id="自动注入-Autowired和-Resource"><a href="#自动注入-Autowired和-Resource" class="headerlink" title="自动注入@Autowired和@Resource"></a>自动注入@Autowired和@Resource</h1><span id="more"></span>
-
-<h4 id="1-来源不同"><a href="#1-来源不同" class="headerlink" title="1.来源不同"></a>1.来源不同</h4><blockquote>
-<ul>
-<li>@Autowired来自Spring，全路径类名为：org.springframework.beans.factory.annotation.Autowired</li>
-<li>@Resource 来自JDK，全路径类名为：javax.annotation.Resource</li>
-</ul>
-</blockquote>
-<h4 id="2-注入方式不同"><a href="#2-注入方式不同" class="headerlink" title="2.注入方式不同"></a>2.注入方式不同</h4><blockquote>
-<p><del>大家的常识似乎为@Autowired是根据类型注入的，如果两个类实现同一个接口就不能用@Autowired</del>，<strong>但这个常识是错误的</strong></p>
-<p>@Autowired的注入方式为：</p>
-<ul>
-<li>如果查询结果刚好为一个，就将该bean装配给@Autowired指定的数据</li>
-<li>如果查询的结果不止一个，先根据 @Primary 来决策，其次是 @Priority 决策优先级</li>
-<li>最后是根据 Bean 名字的严格匹配来决策</li>
-</ul>
-<p><img src="/pictures/autowire.png" alt="alt 修改config"></p>
-<p>@Resource的注入方式为：</p>
-<ul>
-<li>如果没有指定name和type属性的话，默认首先使用属性名称作为bean name进行注入，如果查询不到，则使用属性的类型进行查找注入</li>
-<li>如果指定了name和type其中一个，就按照指定的来进行注入，找不到或者找到多个，都会抛出异常</li>
-<li>如果同时指定了name和type，则从Spring上下文中找到唯一匹配（类型和名称同时匹配）的bean进行装配，找不到则抛出异常</li>
-</ul>
-</blockquote>
-<h4 id="其他方面"><a href="#其他方面" class="headerlink" title="其他方面"></a>其他方面</h4><blockquote>
-<ul>
-<li><p>如果@Autowired想指定名称注入的话，一般用@Autowired+@Qualifie(“beanName”)的方式</p>
-</li>
-<li><p>@Autowired与@Resource都可以用来装配bean. 都可以写在字段上,或写在setter方法上。</p>
-</li>
-<li><p>@Autowired默认情况下必须要求依赖对象必须存在，如果要允许null值，可以设置它的required属性为false（@Autowired(required&#x3D;false)</p>
-</li>
-</ul>
-</blockquote>
-]]></content>
-      <categories>
-        <category>spring初识</category>
-      </categories>
-      <tags>
-        <tag>Spring</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>hexo-next新增文章</title>
     <url>/2022/09/19/hexo-next%E6%96%B0%E5%A2%9E%E6%96%87%E7%AB%A0/</url>
     <content><![CDATA[<h1 id="hexo-next新增文章"><a href="#hexo-next新增文章" class="headerlink" title="hexo-next新增文章"></a>hexo-next新增文章</h1><span id="more"></span>
@@ -381,6 +336,95 @@
       </categories>
       <tags>
         <tag>hexo</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>自动注入@Autowired和@Resource</title>
+    <url>/2022/09/19/%E8%87%AA%E5%8A%A8%E6%B3%A8%E5%85%A5-Autowired%E5%92%8C-Resource/</url>
+    <content><![CDATA[<h1 id="自动注入-Autowired和-Resource"><a href="#自动注入-Autowired和-Resource" class="headerlink" title="自动注入@Autowired和@Resource"></a>自动注入@Autowired和@Resource</h1><span id="more"></span>
+
+<h4 id="1-来源不同"><a href="#1-来源不同" class="headerlink" title="1.来源不同"></a>1.来源不同</h4><blockquote>
+<ul>
+<li>@Autowired来自Spring，全路径类名为：org.springframework.beans.factory.annotation.Autowired</li>
+<li>@Resource 来自JDK，全路径类名为：javax.annotation.Resource</li>
+</ul>
+</blockquote>
+<h4 id="2-注入方式不同"><a href="#2-注入方式不同" class="headerlink" title="2.注入方式不同"></a>2.注入方式不同</h4><blockquote>
+<p><del>大家的常识似乎为@Autowired是根据类型注入的，如果两个类实现同一个接口就不能用@Autowired</del>，<strong>但这个常识是错误的</strong></p>
+<p>@Autowired的注入方式为：</p>
+<ul>
+<li>如果查询结果刚好为一个，就将该bean装配给@Autowired指定的数据</li>
+<li>如果查询的结果不止一个，先根据 @Primary 来决策，其次是 @Priority 决策优先级</li>
+<li>最后是根据 Bean 名字的严格匹配来决策</li>
+</ul>
+<p><img src="/pictures/autowire.png" alt="alt 修改config"></p>
+<p>@Resource的注入方式为：</p>
+<ul>
+<li>如果没有指定name和type属性的话，默认首先使用属性名称作为bean name进行注入，如果查询不到，则使用属性的类型进行查找注入</li>
+<li>如果指定了name和type其中一个，就按照指定的来进行注入，找不到或者找到多个，都会抛出异常</li>
+<li>如果同时指定了name和type，则从Spring上下文中找到唯一匹配（类型和名称同时匹配）的bean进行装配，找不到则抛出异常</li>
+</ul>
+</blockquote>
+<h4 id="其他方面"><a href="#其他方面" class="headerlink" title="其他方面"></a>其他方面</h4><blockquote>
+<ul>
+<li><p>如果@Autowired想指定名称注入的话，一般用@Autowired+@Qualifie(“beanName”)的方式</p>
+</li>
+<li><p>@Autowired与@Resource都可以用来装配bean. 都可以写在字段上,或写在setter方法上。</p>
+</li>
+<li><p>@Autowired默认情况下必须要求依赖对象必须存在，如果要允许null值，可以设置它的required属性为false（@Autowired(required&#x3D;false)</p>
+</li>
+</ul>
+</blockquote>
+]]></content>
+      <categories>
+        <category>spring初识</category>
+      </categories>
+      <tags>
+        <tag>Spring</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>springboot配置和启动</title>
+    <url>/2022/10/21/springboot%E9%85%8D%E7%BD%AE%E5%92%8C%E5%90%AF%E5%8A%A8/</url>
+    <content><![CDATA[<h1 id="springboot配置和启动"><a href="#springboot配置和启动" class="headerlink" title="springboot配置和启动"></a>springboot配置和启动</h1><h4 id="自动配置流程"><a href="#自动配置流程" class="headerlink" title="自动配置流程"></a>自动配置流程</h4><ul>
+<li>@SpringBootApplication中包含@EnableAutoConfiguration，@EnableAutoConfiguration中包含@Import({AutoConfigurationImportSelector.class})</li>
+<li>AutoConfigurationImportSelector类继承了DeferredImportSelector，而这个类扫描具有META-INF&#x2F;spring.factories文件</li>
+<li>把spring.factories中的类加载到spring容器的加载顺序中，进行加载；而大多数自动配置类中有@ConditionalOnBean容器中存在指定Bean才生效</li>
+<li>DeferredImportSelector的作用可以把扫描的文件中的类进行分组和排序</li>
+</ul>
+<h3 id="启动"><a href="#启动" class="headerlink" title="启动"></a>启动</h3><ul>
+<li>创建SpringApplication</li>
+</ul>
+<blockquote>
+<ol>
+<li>获取启动类 </li>
+<li>获取web应用类型 </li>
+<li>读取了spring.factroy中对外扩展的ApplicationContextInitializer  ,ApplicationListener </li>
+<li>根据main推算出所在的类</li>
+</ol>
+</blockquote>
+<ul>
+<li><p>run时</p>
+<blockquote>
+<ol>
+<li>读取 配置信息 </li>
+<li>创建spring上下文，初始化上下文</li>
+<li>调用refresh 加载ioc容器(加载所有的自动配置类和创建servlet容器),<strong>内置tomcat</strong>在onRefresh中实现了启动tomcat</li>
+<li>调用监听器(方便扩展)</li>
+</ol>
+<ul>
+<li><strong>外置tomcat</strong></li>
+</ul>
+<p>tomcat实现了servlet 3.0的规定，SPI加载META-INF&#x2F;services 文件夹中找到javax.servlet.ServletContainerInitializer接口，这个接口的实现类进行了 DispatcherServlet的创建绑定tomcat  和 springboot的启动和</p>
+</blockquote>
+</li>
+</ul>
+]]></content>
+      <categories>
+        <category>springboot</category>
+      </categories>
+      <tags>
+        <tag>java</tag>
       </tags>
   </entry>
   <entry>
